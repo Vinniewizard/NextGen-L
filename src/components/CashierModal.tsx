@@ -72,7 +72,7 @@ export default function CashierModal({
     if (isOpen) {
       const userId = currentUser?.id || currentUser?.email || account.id;
       if (userId) {
-        const stored = localStorage.getItem(`lwex_pending_deposit_${userId}`);
+        const stored = localStorage.getItem(`knex_pending_deposit_${userId}`) || localStorage.getItem(`lwex_pending_deposit_${userId}`);
         if (stored) {
           try {
             const parsed = JSON.parse(stored);
@@ -164,6 +164,7 @@ export default function CashierModal({
         setDepositAddress(null);
         setReceiptFile(null);
         setMpesaMessage('');
+        localStorage.removeItem(`knex_pending_deposit_${userId}`);
         localStorage.removeItem(`lwex_pending_deposit_${userId}`);
         setSuccessMsg('Deposit order cancelled. You may now start a new deposit.');
       }
@@ -260,7 +261,7 @@ export default function CashierModal({
       setDepositAddress(generatedObj);
 
       if (userId) {
-        localStorage.setItem(`lwex_pending_deposit_${userId}`, JSON.stringify({
+        const payload = JSON.stringify({
           address: data.address,
           paymentId: data.payment_id,
           amount: data.amount,
@@ -269,7 +270,9 @@ export default function CashierModal({
           coin: selectedCoin,
           network: selectedNetwork,
           sandboxReason: (data.isSandbox && data.sandboxReason) ? data.sandboxReason : ''
-        }));
+        });
+        localStorage.setItem(`knex_pending_deposit_${userId}`, payload);
+        localStorage.setItem(`lwex_pending_deposit_${userId}`, payload);
       }
 
       if (data.isSandbox && data.sandboxReason) {
@@ -311,6 +314,7 @@ export default function CashierModal({
           setDepositAddress(null);
           setSandboxReason('');
           if (userId) {
+            localStorage.removeItem(`knex_pending_deposit_${userId}`);
             localStorage.removeItem(`lwex_pending_deposit_${userId}`);
           }
         } else {
@@ -492,9 +496,10 @@ export default function CashierModal({
 
           setReceiptFile(null);
           setTxHash('');
-          setSuccessMsg('Crypto deposit receipt submitted! LWEX admin will verify the transfer in the ledger and credit your account within 15-30 minutes.');
+          setSuccessMsg('Crypto deposit receipt submitted! Knex admin will verify the transfer in the ledger and credit your account within 15-30 minutes.');
           setDepositAddress(null);
           if (userId) {
+            localStorage.removeItem(`knex_pending_deposit_${userId}`);
             localStorage.removeItem(`lwex_pending_deposit_${userId}`);
           }
           return;
@@ -514,6 +519,7 @@ export default function CashierModal({
         setDepositAddress(null);
         setSandboxReason('');
         if (userId) {
+          localStorage.removeItem(`knex_pending_deposit_${userId}`);
           localStorage.removeItem(`lwex_pending_deposit_${userId}`);
         }
       } else {
@@ -563,7 +569,7 @@ export default function CashierModal({
         <div className="mb-3 sm:mb-5">
           <h2 className={`text-sm sm:text-base font-bold tracking-tight font-sans flex items-center gap-1 sm:gap-1.5 ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
             <Wallet2 className={`h-4 w-4 sm:h-4.5 sm:w-4.5 ${theme === 'dark' ? 'text-white' : 'text-black'}`} />
-            <span className="truncate">LWEX exchange</span>
+            <span className="truncate">Knex Exchange</span>
           </h2>
           <span className="text-[8px] sm:text-[9px] text-gray-400 font-mono font-bold uppercase tracking-wide truncate block">
             WALLET: MT-{account.id.substring(0, 8).toUpperCase()}
@@ -1079,7 +1085,7 @@ export default function CashierModal({
                               className="h-28 w-28 object-contain"
                               referrerPolicy="no-referrer"
                             />
-                            <span className="text-[8px] text-slate-500 font-black uppercase mt-1 tracking-wider font-mono">LWEX SECURE TX</span>
+                            <span className="text-[8px] text-slate-500 font-black uppercase mt-1 tracking-wider font-mono">KNEX SECURE TX</span>
                           </div>
 
                           {/* Address details */}
@@ -1268,6 +1274,7 @@ export default function CashierModal({
                               setSandboxReason('');
                               const userId = currentUser?.id || currentUser?.email || account.id;
                               if (userId) {
+                                localStorage.removeItem(`knex_pending_deposit_${userId}`);
                                 localStorage.removeItem(`lwex_pending_deposit_${userId}`);
                               }
                             }}

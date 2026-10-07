@@ -67,7 +67,7 @@ export default function P2PExpressTrade({
         <div>
           <div className="flex items-center gap-2">
             <Zap className="w-5 h-5 text-[#fcd535]" />
-            <h2 className="text-lg font-black text-white">Binance Express P2P</h2>
+            <h2 className="text-lg font-black text-white">Knex Express P2P</h2>
           </div>
           <p className="text-xs text-slate-400">One-click trade at the best verified market price with zero fees.</p>
         </div>
@@ -165,7 +165,7 @@ export default function P2PExpressTrade({
         </div>
         <div className="flex items-center justify-between">
           <span className="text-slate-400">Auto-Matched Merchant:</span>
-          <span className="text-white font-bold">{bestOrder?.merchant_name || 'Binance Verified Liquidity'}</span>
+          <span className="text-white font-bold">{bestOrder?.merchant_name || 'Knex Verified Liquidity'}</span>
         </div>
         <div className="flex items-center justify-between">
           <span className="text-slate-400">Payment Rail:</span>

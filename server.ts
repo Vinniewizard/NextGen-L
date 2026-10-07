@@ -1032,7 +1032,7 @@ async function startServer() {
      }
   } catch (e) {}
 
-  // Ensure Binance P2P columns exist in p2p_orders table
+  // Ensure Knex P2P columns exist in p2p_orders table
   const p2pExtraColumns = [
     { name: 'merchant_name', type: 'TEXT DEFAULT ""' },
     { name: 'min_limit', type: 'REAL DEFAULT 10.0' },
@@ -1107,12 +1107,12 @@ async function startServer() {
     }
 
     if (orderCount === 0) {
-      console.log('[P2P Setup] Seeding realistic Binance verified merchant liquidity ads...');
+      console.log('[P2P Setup] Seeding realistic Knex P2P verified merchant liquidity ads...');
       const seedAds = [
         {
           id: 'p2p_seed_1',
-          user_id: 'system_merchant_binance_vip',
-          merchant_name: 'BinanceMaster_VIP',
+          user_id: 'system_merchant_knex_vip',
+          merchant_name: 'KnexMaster_VIP',
           type: 'sell',
           coin: 'USDT',
           amount: 15000.0,
@@ -1121,8 +1121,8 @@ async function startServer() {
           paymentMethod: 'Bank Transfer',
           min_limit: 15.0,
           max_limit: 5000.0,
-          payment_details: 'Bank of America | Acct: 4820 9182 4410 | Name: Binance Liquidity Desk | Routing: 026009593',
-          terms: 'Instant release upon funds reflection. Zero fees. Fast & 100% Escrow protected. Strictly no 3rd-party accounts.',
+          payment_details: 'Bank of America | Acct: 4820 9182 4410 | Name: Knex Liquidity Desk | Routing: 026009593',
+          terms: 'Instant release upon funds reflection. Zero fees. Fast & 100% Knex Escrow protected. Strictly no 3rd-party accounts.',
           is_verified: 1,
           completion_rate: 99.8,
           orders_count: 2840,
@@ -1232,17 +1232,17 @@ async function startServer() {
         {
           id: 'p2p_seed_7',
           user_id: 'system_merchant_apex_pay',
-          merchant_name: 'ApexBinance_Pay',
+          merchant_name: 'ApexGlobal_Direct',
           type: 'sell',
           coin: 'USDT',
           amount: 30000.0,
           price: 1.00,
           fiat_currency: 'USD',
-          paymentMethod: 'Binance Pay',
+          paymentMethod: 'Wise',
           min_limit: 10.0,
           max_limit: 8000.0,
-          payment_details: 'Binance Pay ID: 894120593 | Nickname: ApexGlobalTrader',
-          terms: 'Instant zero-fee Binance Pay internal crypto transfer. Automated 10-second release.',
+          payment_details: 'Wise Transfer ID: wise.trader@knex-p2p.com | Nickname: ApexGlobalTrader',
+          terms: 'Instant zero-fee fast transfer. Automated 10-second Knex Escrow release.',
           is_verified: 1,
           completion_rate: 99.7,
           orders_count: 5120,
@@ -1298,11 +1298,11 @@ async function startServer() {
           amount: 180.0,
           price: 580.00,
           fiat_currency: 'USD',
-          paymentMethod: 'Binance Pay',
+          paymentMethod: 'Bank Transfer',
           min_limit: 10.0,
           max_limit: 4000.0,
-          payment_details: 'Binance Pay ID: 109283741 | Instant P2P Settlement',
-          terms: 'Direct BNB liquidity with Binance Pay integration. Immediate release guaranteed.',
+          payment_details: 'Citibank N.A. | Acct: 9182 0481 2291 | Instant P2P Settlement',
+          terms: 'Direct BNB liquidity with Knex Escrow integration. Immediate release guaranteed.',
           is_verified: 1,
           completion_rate: 99.8,
           orders_count: 1250,
@@ -4342,10 +4342,10 @@ Active technical indicator values: ${indicatorsString}.`}`;
 
       let responseText = '';
       if (text.startsWith('/start') || text.toLowerCase().includes('hello') || text.toLowerCase().includes('hi ')) {
-        responseText = `<b>🔮 Welcome to LWEX Exchange Official Portal Bot!</b>\n\nGuiding users into derivatives mastery with zero-loss training.\n\n📈 <b>Active Synthetic Index:</b> MFLOW\n💰 <b>Demo balance pre-loaded:</b> $25,678.91 USDT\n\n<b>Commands available:</b>\n/register — Claim free demo credentials & registration link\n/signals — Scan technical oracle signals\n/mflow — Probe active index stats\n/guides — Access complete platform instruction manuals\n/invite — Get your special Bonus Invitation & promo details\n/help — Show interface directives`;
+        responseText = `<b>🔮 Welcome to Knex Exchange Official Portal Bot!</b>\n\nGuiding users into derivatives mastery with zero-loss training.\n\n📈 <b>Active Synthetic Index:</b> MFLOW\n💰 <b>Demo balance pre-loaded:</b> $25,678.91 USDT\n\n<b>Commands available:</b>\n/register — Claim free demo credentials & registration link\n/signals — Scan technical oracle signals\n/mflow — Probe active index stats\n/guides — Access complete platform instruction manuals\n/invite — Get your special Bonus Invitation & promo details\n/help — Show interface directives`;
       } else if (text.startsWith('/register') || text.toLowerCase().includes('register') || text.toLowerCase().includes('signup')) {
-        const appUrl = 'https://lwex.onrender.com/';
-        responseText = `<b>🚀 Start Binary & Index Trading on LWEX!</b>\n\n1. Open: ${appUrl}\n2. Enter registration profile parameters.\n3. Instantly claim <b>$25,678.91 USDT</b> practice capital!\n4. Link handle inside options console for live notification webhooks.`;
+        const appUrl = 'https://knex.onrender.com/';
+        responseText = `<b>🚀 Start Binary & Index Trading on Knex!</b>\n\n1. Open: ${appUrl}\n2. Enter registration profile parameters.\n3. Instantly claim <b>$25,678.91 USDT</b> practice capital!\n4. Link handle inside options console for live notification webhooks.`;
         
         if (!telegramMockUsers.some(u => u.username === userHandle)) {
           telegramMockUsers.push({
@@ -4356,25 +4356,25 @@ Active technical indicator values: ${indicatorsString}.`}`;
           });
         }
       } else if (text.startsWith('/invite') || text.startsWith('/bonus')) {
-        const appUrl = 'https://lwex.onrender.com/';
+        const appUrl = 'https://knex.onrender.com/';
         const groupLink = telegramConfig.groupLink || 'https://t.me/+V9H-AvU6wl43MTNk';
-        responseText = `<b>🎁 INVITATION BONUS & PROMOTIONAL LAUNCH! 🎁</b>\n\nInvite your trading circles and double your active investment wallet matches!\n\n✨ <b>200% FIRST DEPOSIT MATCH BONUS</b> ✨\nMake your first complete deposit on LWEX and execute more than 5 trades in Real Mode to unlock a magnificent <b>200% Cash Balance match</b> automatically credited to your wallet!\n\n🌟 <b>Referrals Community Reward:</b> Share this Telegram group connection link with your friends to attract elite members and claim shared VIP indicators!\n\n🔗 <b>Register & Trade on Web:</b> ${appUrl}\n👥 <b>Group Invitation Link:</b> ${groupLink}\n\n<i>Help us grow the largest options trading circle on the planet! 📈🔥</i>`;
+        responseText = `<b>🎁 INVITATION BONUS & PROMOTIONAL LAUNCH! 🎁</b>\n\nInvite your trading circles and double your active investment wallet matches!\n\n✨ <b>200% FIRST DEPOSIT MATCH BONUS</b> ✨\nMake your first complete deposit on Knex and execute more than 5 trades in Real Mode to unlock a magnificent <b>200% Cash Balance match</b> automatically credited to your wallet!\n\n🌟 <b>Referrals Community Reward:</b> Share this Telegram group connection link with your friends to attract elite members and claim shared VIP indicators!\n\n🔗 <b>Register & Trade on Web:</b> ${appUrl}\n👥 <b>Group Invitation Link:</b> ${groupLink}\n\n<i>Help us grow the largest options trading circle on the planet! 📈🔥</i>`;
       } else if (text.startsWith('/signals') || text.toLowerCase().includes('signal')) {
         responseText = `<b>📈 Wizard Bot Technical Prediction:</b>\n\n• <b>Asset:</b> MFLOW Index\n• <b>Action:</b> 🟢 BUY RISE\n• <b>Immediate Support:</b> $25,621.00\n• <b>Target resistance:</b> $25,710.00\n• <b>Confidence Index:</b> 84%\n\n<i>Oracle Notes: RSI moving average indicates oversold condition. Strong up-trend in option volume.</i>`;
       } else if (text.startsWith('/mflow') || text.toLowerCase().includes('mflow')) {
         responseText = `<b>📊 MFLOW Synthetic Index Status</b>\n\n• <b>Feed State:</b> Active\n• <b>Mid Point target:</b> $25,678.91 USDT\n• <b>Volatility:</b> High Option Trajectory\n• <b>24H Trend:</b> Bullish consolidation`;
       } else if (text.startsWith('/guides') || text.startsWith('/guide')) {
-        responseText = `<b>📖 LWEX Platform Interactive Handbooks</b>\n\nClick any command below to load step-by-step procedures immediately:\n\n⚙️ /guide_overview — Platform Mechanism & Details\n🚀 /guide_register — How to Register & Onboard\n📈 /guide_trade — How to Trade & Place Options\n💳 /guide_deposit — How to make deposits (Crypto & M-Pesa)\n📥 /guide_withdrawal — How to request Withdrawals\n\n<i>Tip: Admin can broadcast these manuals anytime from the Dashboard.</i>`;
+        responseText = `<b>📖 Knex Platform Interactive Handbooks</b>\n\nClick any command below to load step-by-step procedures immediately:\n\n⚙️ /guide_overview — Platform Mechanism & Details\n🚀 /guide_register — How to Register & Onboard\n📈 /guide_trade — How to Trade & Place Options\n💳 /guide_deposit — How to make deposits (Crypto & M-Pesa)\n📥 /guide_withdrawal — How to request Withdrawals\n\n<i>Tip: Admin can broadcast these manuals anytime from the Dashboard.</i>`;
       } else if (text.startsWith('/guide_overview')) {
-        responseText = `<b>⚙️ LWEX Exchange - Operational Blueprint</b>\n\nLWEX is an high-performance synthetic options trading platform:\n\n• <b>Synthetic Price Feeds:</b> Features highly responsive tick indexes (e.g. MFLOW index) moving 24/7/365.\n• <b>Fast Options Expiration:</b> Enter transactions with expiration durations starting at just 10 seconds up to minutes.\n• <b>Calibrated Payouts:</b> Delivers profit yields of up to 95% on accurate price vector predictions (Rise/Fall).\n• <b>No-Risk Environment:</b> Preconditioned with fully managed demo training accounts.`;
+        responseText = `<b>⚙️ Knex Exchange - Operational Blueprint</b>\n\nKnex is an high-performance synthetic options trading platform:\n\n• <b>Synthetic Price Feeds:</b> Features highly responsive tick indexes (e.g. MFLOW index) moving 24/7/365.\n• <b>Fast Options Expiration:</b> Enter transactions with expiration durations starting at just 10 seconds up to minutes.\n• <b>Calibrated Payouts:</b> Delivers profit yields of up to 95% on accurate price vector predictions (Rise/Fall).\n• <b>No-Risk Environment:</b> Preconditioned with fully managed demo training accounts.`;
       } else if (text.startsWith('/guide_register')) {
-        responseText = `<b>🚀 How to Register & Onboard on LWEX</b>\n\nFollow these quick steps to set up your trading profile:\n\n1. Visit the LWEX Web Application Portal.\n2. Click <b>Register/Get Started</b> and fill in your Full Name, Email, and Phone Number (M-Pesa supported).\n3. Claim your pre-loaded <b>$25,678.91 USD</b> practice demo credits immediately!\n4. Link your Telegram Handle in your Profile Tab inside the console to listen to real-time notification alerts.`;
+        responseText = `<b>🚀 How to Register & Onboard on Knex</b>\n\nFollow these quick steps to set up your trading profile:\n\n1. Visit the Knex Web Application Portal.\n2. Click <b>Register/Get Started</b> and fill in your Full Name, Email, and Phone Number (M-Pesa supported).\n3. Claim your pre-loaded <b>$25,678.91 USD</b> practice demo credits immediately!\n4. Link your Telegram Handle in your Profile Tab inside the console to listen to real-time notification alerts.`;
       } else if (text.startsWith('/guide_trade')) {
-        responseText = `<b>📈 How to Trade Options on LWEX</b>\n\nLearn options forecasting in under 60 seconds:\n\n1. Check the active live price feed chart in the terminal center.\n2. In the top bar, toggle between <b>Demo Mode</b> or <b>Real Mode</b>.\n3. In the <b>Trade Controls</b>, select your Option Stake (e.g., $10 to $1,000) and expiration duration.\n4. Forecast the trend trajectory:\n   • Click <b>🟢 RISE / BUY UP</b> if you predict the price will settle higher than your entry.\n   • Click <b>🔴 FALL / BUY DOWN</b> if you predict it will settle lower.\n5. Watch the countdown. Upon option expiry, correct predictions credit your balance instantly!`;
+        responseText = `<b>📈 How to Trade Options on Knex</b>\n\nLearn options forecasting in under 60 seconds:\n\n1. Check the active live price feed chart in the terminal center.\n2. In the top bar, toggle between <b>Demo Mode</b> or <b>Real Mode</b>.\n3. In the <b>Trade Controls</b>, select your Option Stake (e.g., $10 to $1,000) and expiration duration.\n4. Forecast the trend trajectory:\n   • Click <b>🟢 RISE / BUY UP</b> if you predict the price will settle higher than your entry.\n   • Click <b>🔴 FALL / BUY DOWN</b> if you predict it will settle lower.\n5. Watch the countdown. Upon option expiry, correct predictions credit your balance instantly!`;
       } else if (text.startsWith('/guide_deposit')) {
-        responseText = `<b>💳 How to Make a Deposit (Crypto & M-Pesa)</b>\n\nFund your Real Wallet seamlessly using either option:\n\n• <b>Option A: Crypto Transfer (USDT Multi-Chain)</b>\n  1. Go to the <b>Cashier</b> -> Click **Deposit**.\n  2. Select your currency (USDT ERC20 / TRC20 / BEP20) to view your dedicated deposit address or scan the QR Code.\n  3. Send USDT from Binance, TrustWallet, or MetaMask. Click 'Verify Payment' in minutes.\n\n• <b>Option B: M-Pesa Paybill (Local Payments)</b>\n  1. Dial Lipa Na M-Pesa -> <b>Paybill</b>.\n  2. Enter Business Number <b>4323297</b>, and Account: <code>LWEX-${userHandle}</code>.\n  3. Pay your amount, capture a screenshot of the confirmation message.\n  4. Upload the receipt file into the Cashier modal. Admin credits your account in 5 minutes!`;
+        responseText = `<b>💳 How to Make a Deposit (Crypto & M-Pesa)</b>\n\nFund your Real Wallet seamlessly using either option:\n\n• <b>Option A: Crypto Transfer (USDT Multi-Chain)</b>\n  1. Go to the <b>Cashier</b> -> Click **Deposit**.\n  2. Select your currency (USDT ERC20 / TRC20 / BEP20) to view your dedicated deposit address or scan the QR Code.\n  3. Send USDT from TrustWallet, MetaMask, or your crypto wallet. Click 'Verify Payment' in minutes.\n\n• <b>Option B: M-Pesa Paybill (Local Payments)</b>\n  1. Dial Lipa Na M-Pesa -> <b>Paybill</b>.\n  2. Enter Business Number <b>4323297</b>, and Account: <code>KNEX-${userHandle}</code>.\n  3. Pay your amount, capture a screenshot of the confirmation message.\n  4. Upload the receipt file into the Cashier modal. Admin credits your account in 5 minutes!`;
       } else if (text.startsWith('/guide_withdrawal')) {
-        responseText = `<b>📥 How to Request a Withdrawal on LWEX</b>\n\nInitiate secure fund settlements anytime:\n\n1. Click on <b>Cashier</b> and navigate to the <b>Withdraw</b> tab.\n2. Ensure your active account is set to <b>Real Balance</b> mode and you have settled funds.\n3. Enter your Crypto standard network (USDT TRC-20 recommended for low fees) and input your destination wallet address.\n4. Verify your identity with your pre-set profile PIN or Two-Factor security challenge.\n5. Submit your withdrawal request. Requests are fully audited by the ledger and settled in 15–30 minutes!`;
+        responseText = `<b>📥 How to Request a Withdrawal on Knex</b>\n\nInitiate secure fund settlements anytime:\n\n1. Click on <b>Cashier</b> and navigate to the <b>Withdraw</b> tab.\n2. Ensure your active account is set to <b>Real Balance</b> mode and you have settled funds.\n3. Enter your Crypto standard network (USDT TRC-20 recommended for low fees) and input your destination wallet address.\n4. Verify your identity with your pre-set profile PIN or Two-Factor security challenge.\n5. Submit your withdrawal request. Requests are fully audited by the ledger and settled in 15–30 minutes!`;
       } else if (text.startsWith('/help')) {
         responseText = `<b>🤖 Wizard Bot Command Manual:</b>\n\n• /start — Welcome dashboard\n• /register — Onboard profile link\n• /signals — Live AI technical advice\n• /mflow — Retrieve synthetic index status\n• /guides — Interactive step-by-step procedures\n• /invite — Special referral invite & 200% first deposit bonus guidelines`;
       } else if (text.startsWith('/')) {

@@ -52,7 +52,7 @@ export default function P2PNavigation({
         </div>
       )}
 
-      {/* Main Binance Navigation Bar */}
+      {/* Main Knex Navigation Bar */}
       <div className={`flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-2xl border ${
         isDark ? 'bg-[#181a20] border-[#2b313a]' : 'bg-white border-slate-200 shadow-sm'
       }`}>
@@ -63,14 +63,14 @@ export default function P2PNavigation({
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-lg font-black tracking-tight text-white flex items-center gap-1.5">
-                Binance P2P
+                Knex P2P
               </h1>
               <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                 0% Fee
               </span>
             </div>
             <p className="text-xs text-slate-400">
-              Trade crypto securely with verified local merchants & bank/mobile rails.
+              Trade crypto securely with verified local merchants & bank/mobile rails with instant escrow protection.
             </p>
           </div>
         </div>
@@ -88,7 +88,7 @@ export default function P2PNavigation({
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              P2P Trading
+              P2P Marketplace
             </button>
 
             <button
@@ -127,7 +127,7 @@ export default function P2PNavigation({
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              User Center
+              Merchant Center
             </button>
           </div>
 
@@ -149,7 +149,7 @@ export default function P2PNavigation({
             <div className="flex items-center justify-between border-b border-[#2b313a] pb-3">
               <h3 className="text-base font-bold flex items-center gap-2">
                 <HelpCircle className="w-5 h-5 text-[#fcd535]" />
-                How Binance P2P Works
+                How Knex P2P Works
               </h3>
               <button onClick={() => setShowHowItWorks(false)} className="text-slate-400 hover:text-white">
                 <X className="w-5 h-5" />
@@ -161,7 +161,7 @@ export default function P2PNavigation({
                 <div className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center shrink-0">1</div>
                 <div>
                   <h4 className="font-bold text-sm text-white mb-0.5">Place an Order</h4>
-                  <p className="text-slate-400">Choose a merchant advertisement. The seller's crypto is locked in Binance Escrow immediately upon order creation.</p>
+                  <p className="text-slate-400">Choose a merchant advertisement. The seller's crypto is locked in Knex Escrow vault immediately upon order creation.</p>
                 </div>
               </div>
 
@@ -169,7 +169,7 @@ export default function P2PNavigation({
                 <div className="w-6 h-6 rounded-full bg-yellow-500/20 text-[#fcd535] font-bold flex items-center justify-center shrink-0">2</div>
                 <div>
                   <h4 className="font-bold text-sm text-white mb-0.5">Pay the Seller</h4>
-                  <p className="text-slate-400">Transfer funds to the seller using their specified payment details (Bank Transfer, M-Pesa, etc.). Then click "Transferred, notify seller".</p>
+                  <p className="text-slate-400">Transfer funds to the seller using their specified payment details (Bank Transfer, M-Pesa, Chipper, etc.). Then click "Transferred, notify seller".</p>
                 </div>
               </div>
 

@@ -73,7 +73,7 @@ export default function P2PUserCenter({
               </span>
             </div>
             <div className="text-xs text-slate-400 font-mono mt-0.5">
-              UID: {currentUser?.id?.substring(0, 10) || 'USER-98412'} · Email: {currentUser?.email || 'trader@lwex.io'}
+              UID: {currentUser?.id?.substring(0, 10) || 'USER-98412'} · Email: {currentUser?.email || 'trader@knex.io'}
             </div>
           </div>
         </div>

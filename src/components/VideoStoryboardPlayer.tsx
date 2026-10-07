@@ -169,7 +169,7 @@ export default function VideoStoryboardPlayer({ platformName, accentColor, refer
     const drawStatusBar = () => {
       ctx.fillStyle = "rgba(148, 163, 184, 0.45)";
       ctx.font = "bold 13px system-ui, sans-serif";
-      ctx.fillText("LwexNet 5G", 30, 42);
+      ctx.fillText("KnexNet 5G", 30, 42);
       ctx.fillText("09:15 UTC", W / 2 - 28, 42);
 
       // Battery icon
@@ -695,7 +695,7 @@ export default function VideoStoryboardPlayer({ platformName, accentColor, refer
       // TikTok channel tags
       ctx.font = "12px system-ui, sans-serif";
       ctx.fillStyle = "rgba(148, 163, 184, 0.8)";
-      ctx.fillText(`@LwexOfficial • Trade Link In Bio 👇`, 45, H - 110);
+      ctx.fillText(`@KnexOfficial • Trade Link In Bio 👇`, 45, H - 110);
     };
 
     // Orchestrate render depending on timing

@@ -95,7 +95,7 @@ export default function WizardBot({
       
       if (recentWins.length > 0) {
         const randomWin = recentWins[Math.floor(Math.random() * recentWins.length)];
-        const msgText = `<b>DISBURSEMENT ALERT</b>\n\nPayment successfully sent to user <b>${currentUser?.fullName || 'LWEX Member 928'}</b>\n\nAsset: ${randomWin.assetSymbol}\nProfit: <b>$${randomWin.profit.toFixed(2)}</b>\nMethod: USDT-TRC20\nStatus: Settled ✅`;
+        const msgText = `<b>DISBURSEMENT ALERT</b>\n\nPayment successfully sent to user <b>${currentUser?.fullName || 'Knex Member 928'}</b>\n\nAsset: ${randomWin.assetSymbol}\nProfit: <b>$${randomWin.profit.toFixed(2)}</b>\nMethod: USDT-TRC20\nStatus: Settled ✅`;
         
         // Push this log into the Telegram simulator
         setTgLogs(prev => [...prev, {
@@ -110,7 +110,8 @@ export default function WizardBot({
     return () => clearInterval(interval);
   }, [botTab, isOpen]);
 
-  const isAdmin = currentUser?.email === 'admin@lwex.com' ||
+  const isAdmin = currentUser?.email === 'admin@knex.com' ||
+                  currentUser?.email === 'admin@lwex.com' ||
                   currentUser?.email === 'peterchristine' ||
                   currentUser?.email === 'lucasantiago';
 
@@ -119,7 +120,7 @@ export default function WizardBot({
     {
       id: 'init-msg',
       sender: 'ai',
-      text: `Welcome to the LWEX AI Terminal. I am your quantitative copilot. I am currently monitoring the order book and liquidity flow for ${asset.name}. How can I assist your execution strategy today?`,
+      text: `Welcome to the Knex AI Terminal. I am your quantitative copilot. I am currently monitoring the order book and liquidity flow for ${asset.name}. How can I assist your execution strategy today?`,
       timestamp: Date.now()
     }
   ]);
@@ -157,7 +158,7 @@ export default function WizardBot({
   useEffect(() => {
     if (currentUser) {
       fetch('/api/users/referrals', {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('lwex_token') || ''}` }
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('knex_token') || localStorage.getItem('lwex_token') || ''}` }
       })
       .then(r => r.json())
       .then(d => {
@@ -184,8 +185,8 @@ export default function WizardBot({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userToken: localStorage.getItem('lwex_token'),
-          content: `LWEX Copilot generated a simulated payment for ${amount} ${coin}.`,
+          userToken: localStorage.getItem('knex_token') || localStorage.getItem('lwex_token'),
+          content: `Knex Copilot generated a simulated payment for ${amount} ${coin}.`,
           imageUrl: generateSimulatedScreenshot(amount, coin),
           isBot: true
         })
@@ -205,7 +206,7 @@ export default function WizardBot({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userToken: localStorage.getItem('lwex_token') || '',
+          userToken: localStorage.getItem('knex_token') || localStorage.getItem('lwex_token') || '',
           content: userText,
           isBot: false
         })
@@ -228,7 +229,7 @@ export default function WizardBot({
     {
       id: 'qa-init',
       sender: 'ai',
-      text: `Hello! I'm your LWEX Support AI. How can I help you with the platform today? Ask me any questions about trading, deposits, or how to use our tools.`,
+      text: `Hello! I'm your Knex Support AI. How can I help you with the platform today? Ask me any questions about trading, deposits, or how to use our tools.`,
       timestamp: Date.now()
     }
   ]);
@@ -240,10 +241,10 @@ export default function WizardBot({
 
   // Telegram Integration States
   const [telegramUsername, setTelegramUsername] = useState(() => {
-    return localStorage.getItem('lwex_tg_username') || '';
+    return localStorage.getItem('knex_tg_username') || localStorage.getItem('lwex_tg_username') || '';
   });
   const [isTelegramLinked, setIsTelegramLinked] = useState(() => {
-    return localStorage.getItem('lwex_tg_linked') === 'true';
+    return (localStorage.getItem('knex_tg_linked') === 'true') || (localStorage.getItem('lwex_tg_linked') === 'true');
   });
   
   // Real Setup tokens
@@ -353,7 +354,7 @@ export default function WizardBot({
     } else if (qLower.includes('telegram') || qLower.includes('sync')) {
       instantReply = "You can link your Telegram account in the 'Telegram Sync' tab. This will enable instant trade notifications and real-time alerts.";
     } else if (qLower.includes('demo') || qLower.includes('fake money')) {
-      instantReply = "LWEX starts you with a $10,000 demo balance! Use it to practice trading. You can toggle between demo and real accounts anytime via the Auth menu.";
+      instantReply = "Knex starts you with a $10,000 demo balance! Use it to practice trading. You can toggle between demo and real accounts anytime via the Auth menu.";
     } else if (qLower.includes('trade') || qLower.includes('options') || qLower.includes('how to')) {
       instantReply = "To trade, configure your stake amount and expiry time in the right panel. Then, select either 'UP' or 'DOWN' depending on your market sentiment.";
     }
@@ -423,7 +424,7 @@ export default function WizardBot({
       } else if (qLower.includes('telegram') || qLower.includes('sync')) {
         instantReply = "You can link your Telegram account in the 'Telegram Sync' tab. This will enable instant trade notifications and real-time alerts.";
       } else if (qLower.includes('demo') || qLower.includes('fake money')) {
-        instantReply = "LWEX starts you with a $10,000 demo balance! Use it to practice trading. You can toggle between demo and real accounts via the Auth menu.";
+        instantReply = "Knex starts you with a $10,000 demo balance! Use it to practice trading. You can toggle between demo and real accounts via the Auth menu.";
       }
       
       if (instantReply) {
@@ -528,6 +529,8 @@ export default function WizardBot({
     const cleanUsername = telegramUsername.startsWith('@') ? telegramUsername : `@${telegramUsername}`;
     setTelegramUsername(cleanUsername);
     setIsTelegramLinked(true);
+    localStorage.setItem('knex_tg_username', cleanUsername);
+    localStorage.setItem('knex_tg_linked', 'true');
     localStorage.setItem('lwex_tg_username', cleanUsername);
     localStorage.setItem('lwex_tg_linked', 'true');
     if (triggerToast) {
@@ -539,6 +542,8 @@ export default function WizardBot({
   const handleUnlinkTelegram = () => {
     setIsTelegramLinked(false);
     setTelegramUsername('');
+    localStorage.removeItem('knex_tg_username');
+    localStorage.removeItem('knex_tg_linked');
     localStorage.removeItem('lwex_tg_username');
     localStorage.removeItem('lwex_tg_linked');
     if (triggerToast) triggerToast("Telegram sync disconnected successfully.", true);
@@ -661,7 +666,7 @@ export default function WizardBot({
       if (triggerToast) triggerToast("Please generate a signal first to broadcast.", false);
       return;
     }
-    const signalMsg = `LWEX Active Signal on ${asset.symbol}: [${activeSignal.signal}] with ${activeSignal.levelOfConfidence} confidence. Target Support: ${activeSignal.support}, Resistance: ${activeSignal.resistance}. Oracle Analysis: "${activeSignal.analysis}"`;
+    const signalMsg = `Knex Active Signal on ${asset.symbol}: [${activeSignal.signal}] with ${activeSignal.levelOfConfidence} confidence. Target Support: ${activeSignal.support}, Resistance: ${activeSignal.resistance}. Oracle Analysis: "${activeSignal.analysis}"`;
     handleBroadcastNotification(signalMsg);
   };
 
@@ -681,10 +686,10 @@ export default function WizardBot({
           </div>
           <div>
             <h3 className="text-xs font-bold font-sans tracking-tight flex items-center space-x-1 text-slate-900 dark:text-white">
-              <span>LWEX AI Console</span>
+              <span>Knex AI Console</span>
               <Sparkles className="h-3 w-3 text-purple-500" />
             </h3>
-            <span className="text-[9px] text-gray-400 block font-bold font-mono tracking-wider text-left">LWEX GROUP SYSTEM</span>
+            <span className="text-[9px] text-gray-400 block font-bold font-mono tracking-wider text-left">KNEX GROUP SYSTEM</span>
           </div>
         </div>
         <button
@@ -918,7 +923,7 @@ export default function WizardBot({
                 </button>
                 <button
                   type="button"
-                  onClick={() => setInputMessage(`Tell me about LWEX synthetic indices like MFLOW.`)}
+                  onClick={() => setInputMessage(`Tell me about Knex synthetic indices like MFLOW.`)}
                   className="rounded bg-white dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 px-2.5 py-1 hover:border-indigo-500 dark:hover:border-indigo-400 whitespace-nowrap cursor-pointer transition-colors text-slate-700 dark:text-slate-300"
                 >
                   MFLOW Info
@@ -1006,7 +1011,7 @@ export default function WizardBot({
                 <div className="flex flex-col space-y-3 flex-1 justify-between">
                   <div className="space-y-1">
                     <p className="text-[10px] text-gray-400 leading-normal mb-2 text-left">
-                      Test LWEX Copilot interactions in the group below! Send simulated commands or messages to inspect how it answers in real-time.
+                      Test Knex Copilot interactions in the group below! Send simulated commands or messages to inspect how it answers in real-time.
                     </p>
                     
                     {/* Simulated Telegram Group Shell */}
@@ -1015,7 +1020,7 @@ export default function WizardBot({
                       <div className="bg-slate-100 dark:bg-zinc-900 px-2.5 py-1 flex justify-between items-center text-[9px] text-gray-500 border-b border-gray-150 dark:border-zinc-800">
                         <span className="font-bold text-slate-800 dark:text-white flex items-center">
                           <Activity className="w-2.5 h-2.5 text-emerald-500 mr-1" />
-                          LWEX Official Options Group Mockup
+                          Knex Official Options Group Mockup
                         </span>
                         <span className="font-mono text-[8px] uppercase font-bold text-gray-400">Status: Listening</span>
                       </div>
@@ -1034,7 +1039,7 @@ export default function WizardBot({
                       {/* Log feed */}
                       <div className="flex-1 overflow-y-auto p-2.5 space-y-2 text-[10px] scrollbar-thin flex flex-col">
                         {tgLogs.slice(-25).map((log) => {
-                          const isBot = log.sender === 'LWEX Copilot' || log.sender === 'Wizard Bot' || log.sender === 'System Manager' || log.sender === 'Telegram API';
+                          const isBot = log.sender === 'Knex Copilot' || log.sender === 'LWEX Copilot' || log.sender === 'Wizard Bot' || log.sender === 'System Manager' || log.sender === 'Telegram API';
                           return (
                             <div key={log.id} className={`p-2 rounded-lg text-left max-w-[90%] ${
                               isBot 
@@ -1266,7 +1271,7 @@ export default function WizardBot({
 
                   <div className="pt-3 border-t border-gray-150 dark:border-zinc-800">
                     <a 
-                      href={`https://t.me/LWEXOptionsBot?startgroup=true`}
+                      href={`https://t.me/KnexOptionsBot?startgroup=true`}
                       target="_blank"
                       rel="noreferrer"
                       className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded text-[10px] uppercase flex items-center justify-center space-x-1 cursor-pointer select-none transition-all"
@@ -1398,7 +1403,7 @@ export default function WizardBot({
                     {/* Broadcast group Bonus Invite */}
                     <button
                       onClick={() => {
-                        const message = "🎁 EXTRA BONUS INVITATION! Invite friends to join our Telegram group to unlock shared trader bonuses! Plus, enjoy an automatic 200% match bonus on your first deposit after completing 5 trades! Register now and claim real-time-trade signals: https://lwex.onrender.com/";
+                        const message = "🎁 EXTRA BONUS INVITATION! Invite friends to join our Telegram group to unlock shared trader bonuses! Plus, enjoy an automatic 200% match bonus on your first deposit after completing 5 trades! Register now and claim real-time-trade signals: https://knex.onrender.com/";
                         handleBroadcastNotification(message);
                         if (triggerToast) triggerToast("Broadcasted Bonus Invitation Campaign directly to group!", true);
                       }}
@@ -1436,7 +1441,7 @@ export default function WizardBot({
             <div className="border border-slate-200 dark:border-zinc-800 rounded-lg p-3 bg-slate-50 dark:bg-zinc-900/60 space-y-3">
               <h4 className="font-extrabold text-slate-950 dark:text-white flex items-center space-x-1.5 border-b border-gray-150 dark:border-zinc-800 pb-1.5 text-left">
                 <Smartphone className="w-3.5 h-3.5 text-indigo-500" />
-                <span>Onboarding Guide: TG to LWEX</span>
+                <span>Onboarding Guide: TG to Knex</span>
               </h4>
               <p className="text-[10px] text-slate-550 dark:text-slate-400 leading-normal text-left">
                 Follow these simple steps to claim your virtual assets and synchronize your setup:
@@ -1571,7 +1576,7 @@ export default function WizardBot({
               isDark ? 'border-zinc-850 bg-zinc-900/40' : 'border-gray-100 bg-gray-50/20'
             }`}>
               <h3 className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                LWEX Help Desk
+                Knex Help Desk
               </h3>
               <p className="text-[10px] text-slate-500 mt-1 leading-relaxed">
                 Connect directly with our 24/7 AI-powered support. Ask about minimum deposits, withdrawals, platform features, or cross-margin mechanics.

@@ -249,7 +249,7 @@ export default function BannerDesigner({ config, onChange }: BannerDesignerProps
     // Platform Giant Name
     ctx.fillStyle = "#ffffff";
     ctx.font = "900 68px 'Space Grotesk', system-ui, sans-serif";
-    ctx.fillText(config.platformName || "LWEX", textX, 175);
+    ctx.fillText(config.platformName || "KNEX", textX, 175);
 
     // Dynamic glowing line accent under name
     ctx.strokeStyle = accentHex;

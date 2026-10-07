@@ -26,17 +26,18 @@ export default function SettingsModal({ isOpen, onClose, account, theme, current
   const [balanceUpdate, setBalanceUpdate] = React.useState(currentUser?.notifSettings?.balanceUpdate ?? true);
   const [promotion, setPromotion] = React.useState(currentUser?.notifSettings?.promotion ?? false);
   const [broadcastFrequency, setBroadcastFrequency] = React.useState(currentUser?.notifSettings?.broadcastFrequency ?? '1h');
-  const isAdmin = currentUser?.email === 'admin@lwex.com' ||
+  const isAdmin = currentUser?.email === 'admin@knex.com' ||
+                  currentUser?.email === 'admin@lwex.com' ||
                   currentUser?.email === 'peterchristine' ||
                   currentUser?.email === 'lucasantiago';
 
   const [activeSettingsTab, setActiveSettingsTab] = useState('profile');
   
   const [demoModeEnabled, setDemoModeEnabled] = useState(
-    JSON.parse(localStorage.getItem('lwex_admin_demo_enabled') ?? 'true')
+    JSON.parse(localStorage.getItem('knex_admin_demo_enabled') ?? localStorage.getItem('lwex_admin_demo_enabled') ?? 'true')
   );
   const [realModeEnabled, setRealModeEnabled] = useState(
-    JSON.parse(localStorage.getItem('lwex_admin_real_enabled') ?? 'true')
+    JSON.parse(localStorage.getItem('knex_admin_real_enabled') ?? localStorage.getItem('lwex_admin_real_enabled') ?? 'true')
   );
 
   const saveNotifSettings = () => {
@@ -46,16 +47,21 @@ export default function SettingsModal({ isOpen, onClose, account, theme, current
         notifSettings: { tradeSettlement, balanceUpdate, promotion, broadcastFrequency }
       };
       
-      const users = JSON.parse(localStorage.getItem('lwex_users') || '[]');
+      const users = JSON.parse(localStorage.getItem('knex_users') || localStorage.getItem('lwex_users') || '[]');
       const updatedUsers = users.map((u: any) => u.email === currentUser.email ? updatedUser : u);
+      localStorage.setItem('knex_users', JSON.stringify(updatedUsers));
       localStorage.setItem('lwex_users', JSON.stringify(updatedUsers));
       onUpdateUser(updatedUser);
     }
   };
 
   const saveAdminSettings = (demo: boolean, real: boolean) => {
+    localStorage.setItem('knex_admin_demo_enabled', JSON.stringify(demo));
+    localStorage.setItem('knex_admin_real_enabled', JSON.stringify(real));
     localStorage.setItem('lwex_admin_demo_enabled', JSON.stringify(demo));
     localStorage.setItem('lwex_admin_real_enabled', JSON.stringify(real));
+    window.dispatchEvent(new Event('knex-settings-changed'));
+    window.dispatchEvent(new Event('lwex-settings-changed'));
     setDemoModeEnabled(demo);
     setRealModeEnabled(real);
   };
@@ -87,13 +93,14 @@ export default function SettingsModal({ isOpen, onClose, account, theme, current
     setIsEditingPhone(false);
     
     if (currentUser && onUpdateUser) {
-      const users = JSON.parse(localStorage.getItem('lwex_users') || '[]');
+      const users = JSON.parse(localStorage.getItem('knex_users') || localStorage.getItem('lwex_users') || '[]');
       const updatedUsers = users.map((u: any) => {
           if (u.email === currentUser.email) {
               return { ...u, phone: phoneInput };
           }
           return u;
       });
+      localStorage.setItem('knex_users', JSON.stringify(updatedUsers));
       localStorage.setItem('lwex_users', JSON.stringify(updatedUsers));
       onUpdateUser({ ...currentUser, phone: phoneInput });
     }
@@ -108,13 +115,14 @@ export default function SettingsModal({ isOpen, onClose, account, theme, current
     setIsEditingEmail(false);
     
     if (currentUser && onUpdateUser) {
-      const users = JSON.parse(localStorage.getItem('lwex_users') || '[]');
+      const users = JSON.parse(localStorage.getItem('knex_users') || localStorage.getItem('lwex_users') || '[]');
       const updatedUsers = users.map((u: any) => {
           if (u.email === currentUser.email) {
               return { ...u, email: emailInput };
           }
           return u;
       });
+      localStorage.setItem('knex_users', JSON.stringify(updatedUsers));
       localStorage.setItem('lwex_users', JSON.stringify(updatedUsers));
       onUpdateUser({ ...currentUser, email: emailInput });
     }
@@ -247,7 +255,7 @@ export default function SettingsModal({ isOpen, onClose, account, theme, current
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
-                      <h3 className="font-bold text-sm">{currentUser?.email || 'LWEX Client'}</h3>
+                      <h3 className="font-bold text-sm">{currentUser?.email || 'Knex Client'}</h3>
                       <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wide border ${
                         account.mode === 'real' 
                           ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' 
@@ -599,7 +607,7 @@ export default function SettingsModal({ isOpen, onClose, account, theme, current
 
         <div className={`p-6 border-t ${isDark ? 'border-zinc-800' : 'border-gray-100'}`}>
           <p className="text-[10px] text-center text-gray-450 font-mono font-bold tracking-widest uppercase">
-            LWEX Secure Node v2.0.4.stable
+            Knex Secure Node v2.0.4.stable
           </p>
         </div>
       </div>

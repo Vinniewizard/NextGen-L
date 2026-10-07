@@ -164,7 +164,7 @@ export default function P2POrderRow({
                 {mName}
               </span>
               {order.is_verified ? (
-                <span title="Binance Verified Merchant" className="text-[#fcd535]">
+                <span title="Knex Verified Merchant" className="text-[#fcd535]">
                   <Award className="w-3.5 h-3.5 fill-[#fcd535]/20 text-[#fcd535]" />
                 </span>
               ) : null}
@@ -236,7 +236,7 @@ export default function P2POrderRow({
       </div>
 
       {/* ======================================================== */}
-      {/* THE OVERS - Authentic Binance Order Drawer */}
+      {/* THE OVERS - Authentic Knex Order Drawer */}
       {/* ======================================================== */}
       {isExpanded && (
         <div className="p-5 md:p-6 bg-[#181a20] border-t border-[#2b313a] animate-fade-in">

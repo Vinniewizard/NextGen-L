@@ -53,13 +53,15 @@ export interface UserInfo {
 
 export const PAYMENT_METHODS = [
   'All Payments',
-  'Bank Transfer',
   'M-Pesa',
+  'Bank Transfer',
   'Chipper Cash',
   'Revolut',
   'Wise',
-  'Binance Pay',
-  'SEPA Instant'
+  'Knex Pay',
+  'SEPA Instant',
+  'PayPal',
+  'Apple Pay'
 ];
 
 export const FIAT_CURRENCIES = [
@@ -69,6 +71,9 @@ export const FIAT_CURRENCIES = [
   { code: 'EUR', name: 'EUR - Euro', symbol: '€' },
   { code: 'GBP', name: 'GBP - British Pound', symbol: '£' },
   { code: 'NGN', name: 'NGN - Nigerian Naira', symbol: '₦' },
+  { code: 'UGX', name: 'UGX - Ugandan Shilling', symbol: 'USh' },
+  { code: 'TZS', name: 'TZS - Tanzanian Shilling', symbol: 'TSh' },
+  { code: 'ZAR', name: 'ZAR - South African Rand', symbol: 'R' },
   { code: 'INR', name: 'INR - Indian Rupee', symbol: '₹' },
   { code: 'CAD', name: 'CAD - Canadian Dollar', symbol: 'C$' },
   { code: 'AED', name: 'AED - UAE Dirham', symbol: 'AED' }

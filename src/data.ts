@@ -3,7 +3,7 @@ import { Asset } from './types';
 export const ASSETSList: Asset[] = [
   {
     id: 'R_10',
-    name: 'LWEX Flow',
+    name: 'Knex Flow',
     symbol: 'MFLOW',
     type: 'syndicate',
     price: 155.45,
@@ -11,7 +11,7 @@ export const ASSETSList: Asset[] = [
     volatility: 0.22,
     trendBias: 0.001,
     decimals: 2,
-    description: 'A custom synthetic index simulating the steady electronic flow of LWEX systems with 10% constant variation.'
+    description: 'A custom synthetic index simulating the steady electronic flow of Knex systems with 10% constant variation.'
   },
   {
     id: 'R_25',
@@ -47,11 +47,11 @@ export const ASSETSList: Asset[] = [
     volatility: 38.5,
     trendBias: 0.0005,
     decimals: 4,
-    description: 'Highly dynamic and aggressive price oscillations as predicted by the LWEX Oracle system.'
+    description: 'Highly dynamic and aggressive price oscillations as predicted by the Knex Oracle system.'
   },
   {
     id: 'R_100',
-    name: 'LWEX Oracle',
+    name: 'Knex Oracle',
     symbol: 'WIZARD',
     type: 'syndicate',
     price: 9815.10,
@@ -59,7 +59,7 @@ export const ASSETSList: Asset[] = [
     volatility: 2.1,
     trendBias: -0.001,
     decimals: 2,
-    description: 'Rapid-fire market execution with extreme frequency, simulating the chaotic precision of the LWEX Oracle.'
+    description: 'Rapid-fire market execution with extreme frequency, simulating the chaotic precision of the Knex Oracle.'
   },
   {
     id: 'J_10',

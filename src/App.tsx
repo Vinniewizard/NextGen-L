@@ -3207,7 +3207,7 @@ export default function App() {
     if (view === 'p2p') {
       if (account.mode !== 'real') {
         handleSwitchAccount('real');
-        triggerToast("Switched to Real Account for P2P Escrow Trading.", true);
+        triggerToast("Switched to Real Account for Knex P2P Escrow Trading.", true);
       }
     }
     if (view === 'history') setPositionsTab('statements');
@@ -3779,10 +3779,10 @@ export default function App() {
                 ? 'bg-indigo-600 text-white font-black shadow-md' 
                 : 'text-slate-450 hover:bg-slate-900/50 hover:text-white'
             }`}
-            title={desktopSidebarCollapsed ? "P2P Marketplace" : undefined}
+            title={desktopSidebarCollapsed ? "Knex P2P" : undefined}
           >
             <Shield className="w-4 h-4 shrink-0" />
-            {!desktopSidebarCollapsed && <span>P2P Marketplace</span>}
+            {!desktopSidebarCollapsed && <span>Knex P2P</span>}
           </button>
 
           <button 
@@ -4069,7 +4069,7 @@ export default function App() {
               <div className="flex items-center space-x-2 border border-slate-800 bg-slate-900/50 px-3 py-1.5 rounded-lg text-xs font-mono">
                 <span className="w-2 h-2 rounded-full bg-amber-400" />
                 <span className="font-bold text-white uppercase text-[11px] tracking-wide">
-                  {activeTabView === 'p2p' ? 'P2P Marketplace' :
+                  {activeTabView === 'p2p' ? 'Knex P2P' :
                    activeTabView === 'finance' ? 'Finance & Cashier' :
                    activeTabView === 'history' ? 'Statements Ledger' : 'Overview Analytics'}
                 </span>

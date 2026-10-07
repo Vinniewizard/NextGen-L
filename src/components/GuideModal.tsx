@@ -95,7 +95,7 @@ export default function GuideModal({ isOpen, onClose, triggerToast }: GuideModal
             </div>
 
             <div className="pt-2 space-y-1.5">
-              <span className="block font-bold text-gray-400 uppercase text-[9px] mb-2 tracking-widest pl-1">LWEX Premium</span>
+              <span className="block font-bold text-gray-400 uppercase text-[9px] mb-2 tracking-widest pl-1">Knex Premium</span>
               <button
                 onClick={() => setActiveTab('pro-academy')}
                 className={`flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-xs font-bold transition-all cursor-pointer border ${

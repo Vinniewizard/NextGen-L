@@ -121,7 +121,7 @@ export default function P2PPostAdModal({
             </div>
             <div>
               <h3 className="text-base font-black text-white">Post P2P Advertisement</h3>
-              <p className="text-xs text-slate-400 font-mono">Binance Standard 3-Step Publisher Wizard</p>
+              <p className="text-xs text-slate-400 font-mono">Knex Standard 3-Step Publisher Wizard</p>
             </div>
           </div>
           <button 
@@ -132,7 +132,7 @@ export default function P2PPostAdModal({
           </button>
         </div>
 
-        {/* 3-Step Binance Stepper Indicator */}
+        {/* 3-Step Knex Stepper Indicator */}
         <div className="grid grid-cols-3 gap-2 text-xs font-mono">
           <div className={`p-2.5 rounded-xl border flex items-center gap-2 ${
             currentStep === 1 

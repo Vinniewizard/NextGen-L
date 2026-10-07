@@ -230,7 +230,7 @@ export default function InviteModal({ isOpen, onClose, currentUser, theme, trigg
                 <div className="flex flex-col gap-2 shrink-0 w-36">
                   <input
                     type="text"
-                    placeholder="Page Link (e.g. fb.com/lwex)"
+                    placeholder="Page Link (e.g. fb.com/knex)"
                     value={fbUrl}
                     onChange={(e) => setFbUrl(e.target.value)}
                     className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-[9px] text-white focus:outline-none focus:border-blue-500"

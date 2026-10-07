@@ -68,7 +68,7 @@ export default function P2PMarketplace({ currentUser, isDark, onBalanceUpdate, o
       if (saved) return JSON.parse(saved);
       const demo = {
         id: 'trader_' + Math.random().toString(36).substring(2, 9),
-        email: 'verified.trader@binance-p2p.com',
+        email: 'verified.trader@knex-p2p.com',
         name: 'Verified Trader',
         is_verified: true,
         real_balance: 5000
@@ -76,7 +76,7 @@ export default function P2PMarketplace({ currentUser, isDark, onBalanceUpdate, o
       localStorage.setItem('lwex_p2p_demo_user', JSON.stringify(demo));
       return demo;
     } catch {
-      return { id: 'trader_guest', email: 'guest@binance-p2p.com', name: 'Guest Trader', is_verified: true };
+      return { id: 'trader_guest', email: 'guest@knex-p2p.com', name: 'Guest Trader', is_verified: true };
     }
   };
 
@@ -247,7 +247,7 @@ export default function P2PMarketplace({ currentUser, isDark, onBalanceUpdate, o
       if (data.success) {
         setExpandedOrderId(null);
         setSelectedOrderForModal(null);
-        triggerToast(`Escrow Locked! Directing to Binance Live Trade & Chat Room...`, true);
+        triggerToast(`Escrow Locked! Directing to Knex Live Trade & Chat Room...`, true);
         await refreshCurrentTrade(data.tradeId);
         fetchMyTrades();
         fetchUserInfo();
@@ -412,7 +412,7 @@ export default function P2PMarketplace({ currentUser, isDark, onBalanceUpdate, o
       const data = await res.json();
       if (data.success) {
         setShowPostAdModal(false);
-        triggerToast('Your advertisement is now live on the Binance P2P order book!', true);
+        triggerToast('Your advertisement is now live on the Knex P2P order book!', true);
         fetchOrders();
         fetchUserInfo();
       } else {
@@ -538,7 +538,7 @@ export default function P2PMarketplace({ currentUser, isDark, onBalanceUpdate, o
       )}
 
       {/* ========================================================================= */}
-      {/* DIRECT TO ROOM / CHAT ROOM VIEW (Active Binance Escrow Trade Session)     */}
+      {/* DIRECT TO ROOM / CHAT ROOM VIEW (Active Knex Escrow Trade Session)        */}
       {/* ========================================================================= */}
       {currentTrade ? (
         <div className="space-y-4 animate-fade-in">
@@ -552,7 +552,7 @@ export default function P2PMarketplace({ currentUser, isDark, onBalanceUpdate, o
               className="inline-flex items-center gap-2 text-xs font-mono font-bold text-slate-300 hover:text-[#fcd535] transition-colors cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4 text-[#fcd535]" />
-              <span>← Back to P2P Marketplace (Trade #P2P-{currentTrade.id.substring(0, 8)} Active)</span>
+              <span>← Back to Knex P2P (Trade #P2P-{currentTrade.id.substring(0, 8)} Active)</span>
             </button>
 
             <div className="flex items-center gap-3">
@@ -563,7 +563,7 @@ export default function P2PMarketplace({ currentUser, isDark, onBalanceUpdate, o
             </div>
           </div>
 
-          {/* Full Dedicated Binance Trade & Chat Room */}
+          {/* Full Dedicated Knex Trade & Chat Room */}
           <P2PEscrowTradeRoom
             trade={currentTrade}
             order={currentOrder}
@@ -695,7 +695,7 @@ export default function P2PMarketplace({ currentUser, isDark, onBalanceUpdate, o
                 isDark ? 'bg-[#181a20] border-[#2b313a]' : 'bg-white border-slate-200 shadow-sm'
               }`}>
                 
-                {/* Table Header (Exact Binance P2P columns) */}
+                {/* Table Header (Exact Knex P2P columns) */}
                 <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-3.5 text-[11px] font-mono font-bold uppercase tracking-wider text-slate-400 border-b border-[#2b313a] bg-[#1e2329]/40">
                   <div className="col-span-4">Advertiser (Rate / Speed)</div>
                   <div className="col-span-2 text-right md:text-left">Price</div>

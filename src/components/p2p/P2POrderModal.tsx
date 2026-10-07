@@ -274,7 +274,7 @@ export default function P2POrderModal({
           <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-300 flex items-start gap-2.5">
             <ShieldCheck className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
             <div className="leading-snug">
-              <strong className="text-emerald-200 block">Instant Binance Escrow & Live Chat Room</strong>
+              <strong className="text-emerald-200 block">Instant Knex Escrow & Live Chat Room</strong>
               Upon clicking below, {cryptoAmount || '0'} {order.coin} is locked in the system vault and you are directly directed to the live Trade & Chat Room with the seller.
             </div>
           </div>

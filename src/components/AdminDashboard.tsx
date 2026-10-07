@@ -88,11 +88,11 @@ interface GameSettings {
 }
 
 const PREBUILT_GUIDES = {
-  overview: `<b>⚙️ LWEX Exchange - Operational Blueprint</b>\n\nLWEX is an high-performance synthetic options trading platform:\n\n• <b>Synthetic Price Feeds:</b> Features highly responsive tick indexes (e.g. MFLOW index) moving 24/7/365.\n• <b>Fast Options Expiration:</b> Enter transactions with expiration durations starting at just 10 seconds up to minutes.\n• <b>Calibrated Payouts:</b> Delivers profit yields of up to 95% on accurate price vector predictions (Rise/Fall).\n• <b>No-Risk Environment:</b> Preconditioned with fully managed demo training accounts.`,
-  register: `<b>🚀 How to Register & Onboard on LWEX</b>\n\nFollow these quick steps to set up your trading profile:\n\n1. Visit the LWEX Web Application Portal.\n2. Click <b>Register/Get Started</b> and fill in your Full Name, Email, and Phone Number (M-Pesa supported).\n3. Claim your pre-loaded <b>$25,678.91 USD</b> practice demo credits immediately!\n4. Link your Telegram Handle in your Profile Tab inside the console to listen to real-time notification alerts.`,
-  trade: `<b>📈 How to Trade Options on LWEX</b>\n\nLearn options forecasting in under 60 seconds:\n\n1. Check the active live price feed chart in the terminal center.\n2. In the top bar, toggle between <b>Demo Mode</b> or <b>Real Mode</b>.\n3. In the <b>Trade Controls</b>, select your Option Stake (e.g., $10 to $1,000) and expiration duration.\n4. Forecast the trend trajectory:\n   • Click <b>🟢 RISE / BUY UP</b> if you predict the price will settle higher than your entry.\n   • Click <b>🔴 FALL / BUY DOWN</b> if you predict it will settle lower.\n5. Watch the countdown. Upon option expiry, correct predictions credit your balance instantly!`,
-  deposit: `<b>💳 How to Make a Deposit (Crypto & M-Pesa)</b>\n\nFund your Real Wallet seamlessly using either option:\n\n• <b>Option A: Crypto Transfer (USDT Multi-Chain)</b>\n  1. Go to the <b>Cashier</b> -> Click **Deposit**.\n  2. Select your currency (USDT ERC20 / TRC20 / BEP20) to view your dedicated deposit address or scan the QR Code.\n  3. Send USDT from Binance, TrustWallet, or MetaMask. Click 'Verify Payment' in minutes.\n\n• <b>Option B: M-Pesa Paybill (Local Payments)</b>\n  1. Dial Lipa Na M-Pesa -> <b>Paybill</b>.\n  2. Enter Business Number <b>4323297</b>, and Account: <code>LWEX-YOUR_TELEGRAM</code>.\n  3. Pay your amount, capture a screenshot of the confirmation message.\n  4. Upload the receipt file into the Cashier modal. Admin credits your account in 5 minutes!`,
-  withdrawal: `<b>📥 How to Request a Withdrawal on LWEX</b>\n\nInitiate secure fund settlements anytime:\n\n1. Click on <b>Cashier</b> and navigate to the <b>Withdraw</b> tab.\n2. Ensure your active account is set to <b>Real Balance</b> mode and you have settled funds.\n3. Enter your Crypto standard network (USDT TRC-20 recommended for low fees) and input your destination wallet address.\n4. Verify your identity with your pre-set profile PIN or Two-Factor security challenge.\n5. Submit your withdrawal request. Requests are fully audited by the ledger and settled in 15–30 minutes!`
+  overview: `<b>⚙️ KNEX Exchange - Operational Blueprint</b>\n\nKNEX is a high-performance synthetic options trading platform:\n\n• <b>Synthetic Price Feeds:</b> Features highly responsive tick indexes (e.g. MFLOW index) moving 24/7/365.\n• <b>Fast Options Expiration:</b> Enter transactions with expiration durations starting at just 10 seconds up to minutes.\n• <b>Calibrated Payouts:</b> Delivers profit yields of up to 95% on accurate price vector predictions (Rise/Fall).\n• <b>No-Risk Environment:</b> Preconditioned with fully managed demo training accounts.`,
+  register: `<b>🚀 How to Register & Onboard on KNEX</b>\n\nFollow these quick steps to set up your trading profile:\n\n1. Visit the KNEX Web Application Portal.\n2. Click <b>Register/Get Started</b> and fill in your Full Name, Email, and Phone Number (M-Pesa supported).\n3. Claim your pre-loaded <b>$25,678.91 USD</b> practice demo credits immediately!\n4. Link your Telegram Handle in your Profile Tab inside the console to listen to real-time notification alerts.`,
+  trade: `<b>📈 How to Trade Options on KNEX</b>\n\nLearn options forecasting in under 60 seconds:\n\n1. Check the active live price feed chart in the terminal center.\n2. In the top bar, toggle between <b>Demo Mode</b> or <b>Real Mode</b>.\n3. In the <b>Trade Controls</b>, select your Option Stake (e.g., $10 to $1,000) and expiration duration.\n4. Forecast the trend trajectory:\n   • Click <b>🟢 RISE / BUY UP</b> if you predict the price will settle higher than your entry.\n   • Click <b>🔴 FALL / BUY DOWN</b> if you predict it will settle lower.\n5. Watch the countdown. Upon option expiry, correct predictions credit your balance instantly!`,
+  deposit: `<b>💳 How to Make a Deposit (Crypto & M-Pesa)</b>\n\nFund your Real Wallet seamlessly using either option:\n\n• <b>Option A: Crypto Transfer (USDT Multi-Chain)</b>\n  1. Go to the <b>Cashier</b> -> Click **Deposit**.\n  2. Select your currency (USDT ERC20 / TRC20 / BEP20) to view your dedicated deposit address or scan the QR Code.\n  3. Send USDT from Binance, TrustWallet, or MetaMask. Click 'Verify Payment' in minutes.\n\n• <b>Option B: M-Pesa Paybill (Local Payments)</b>\n  1. Dial Lipa Na M-Pesa -> <b>Paybill</b>.\n  2. Enter Business Number <b>4323297</b>, and Account: <code>KNEX-YOUR_TELEGRAM</code>.\n  3. Pay your amount, capture a screenshot of the confirmation message.\n  4. Upload the receipt file into the Cashier modal. Admin credits your account in 5 minutes!`,
+  withdrawal: `<b>📥 How to Request a Withdrawal on KNEX</b>\n\nInitiate secure fund settlements anytime:\n\n1. Click on <b>Cashier</b> and navigate to the <b>Withdraw</b> tab.\n2. Ensure your active account is set to <b>Real Balance</b> mode and you have settled funds.\n3. Enter your Crypto standard network (USDT TRC-20 recommended for low fees) and input your destination wallet address.\n4. Verify your identity with your pre-set profile PIN or Two-Factor security challenge.\n5. Submit your withdrawal request. Requests are fully audited by the ledger and settled in 15–30 minutes!`
 };
 
 export default function AdminDashboard({ isOpen, onClose, theme, triggerToast }: AdminDashboardProps) {
@@ -113,7 +113,8 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast }:
   const [visitsData, setVisitsData] = useState<{
     visitsCount: number;
     uniqueVisitors: number;
-    lwexCount: number;
+    knexCount?: number;
+    lwexCount?: number;
     recentVisits: any[];
   } | null>(null);
   const [pendingDeposits, setPendingDeposits] = useState<PendingDeposit[]>([]);
@@ -139,10 +140,10 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast }:
   });
   const [isGameLoading, setIsGameLoading] = useState(false);
   const [demoModeEnabled, setDemoModeEnabled] = useState(
-    JSON.parse(localStorage.getItem('lwex_admin_demo_enabled') ?? 'true')
+    JSON.parse(localStorage.getItem('knex_admin_demo_enabled') ?? localStorage.getItem('lwex_admin_demo_enabled') ?? 'true')
   );
   const [realModeEnabled, setRealModeEnabled] = useState(
-    JSON.parse(localStorage.getItem('lwex_admin_real_enabled') ?? 'true')
+    JSON.parse(localStorage.getItem('knex_admin_real_enabled') ?? localStorage.getItem('lwex_admin_real_enabled') ?? 'true')
   );
   const [editingUser, setEditingUser] = useState<User & { newPassword?: string } | null>(null);
   const [userSearchQuery, setUserSearchQuery] = useState('');
@@ -191,7 +192,7 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast }:
     groups: [{ id: Date.now(), link: 'https://chat.whatsapp.com/FA32GpUv1OyES3AYFidIKw?s=cl&p=a&mlu=1' }],
     autoBroadcastEnabled: false,
     broadcastIntervalMinutes: 60,
-    broadcastMessage: 'Welcome to LWEX! Join our community trading signals here: {LINK}',
+    broadcastMessage: 'Welcome to KNEX! Join our community trading signals here: {LINK}',
   });
 
   // Facebook Config
@@ -1063,7 +1064,7 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast }:
             <div className={`p-4 rounded-xl border mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 ${theme === 'dark' ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-gray-200'}`}>
               <div>
                 <div className="flex flex-wrap items-center gap-2">
-                  <h2 className="text-sm font-black tracking-widest text-yellow-500 uppercase">LWEX Admin Terminal</h2>
+                  <h2 className="text-sm font-black tracking-widest text-yellow-500 uppercase">KNEX Admin Terminal</h2>
                   <span className="relative flex h-2 w-2">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
@@ -2046,7 +2047,9 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast }:
                             onChange={(e) => {
                               const checked = e.target.checked;
                               setDemoModeEnabled(checked);
+                              localStorage.setItem('knex_admin_demo_enabled', JSON.stringify(checked));
                               localStorage.setItem('lwex_admin_demo_enabled', JSON.stringify(checked));
+                              window.dispatchEvent(new Event('knex-settings-changed'));
                               window.dispatchEvent(new Event('lwex-settings-changed'));
                             }}
                             className="w-4 h-4 rounded accent-indigo-600"
@@ -2060,7 +2063,9 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast }:
                             onChange={(e) => {
                               const checked = e.target.checked;
                               setRealModeEnabled(checked);
+                              localStorage.setItem('knex_admin_real_enabled', JSON.stringify(checked));
                               localStorage.setItem('lwex_admin_real_enabled', JSON.stringify(checked));
+                              window.dispatchEvent(new Event('knex-settings-changed'));
                               window.dispatchEvent(new Event('lwex-settings-changed'));
                             }}
                             className="w-4 h-4 rounded accent-indigo-600"
@@ -2468,7 +2473,7 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast }:
                             </div>
                             <div className={`p-3.5 rounded-lg border text-left ${theme === 'dark' ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-gray-200'}`}>
                                 <span className="text-[9px] uppercase font-bold text-slate-400 block mb-1">Registration Link Pushed</span>
-                                <p className="text-xs font-mono font-bold text-amber-500 truncate mt-1">lwex.onrender.com</p>
+                                <p className="text-xs font-mono font-bold text-amber-500 truncate mt-1">knex.onrender.com</p>
                                 <span className="text-[8px] text-gray-500 font-medium">Inviting members to signup link</span>
                             </div>
                         </div>
@@ -3068,7 +3073,7 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast }:
                   <div className="flex items-center justify-between border-b border-slate-200 pb-4 dark:border-slate-800">
                     <div>
                       <h3 className="text-lg font-bold">Platform Traffic & Visit Metrics</h3>
-                      <p className="text-xs text-slate-500">Real-time visitor counts, referrer logs, and lwex.onrender.com analytics hits.</p>
+                      <p className="text-xs text-slate-500">Real-time visitor counts, referrer logs, and knex.onrender.com analytics hits.</p>
                     </div>
                   </div>
 
@@ -3088,8 +3093,8 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast }:
 
                     <div className="rounded-xl p-4 border border-yellow-500/30 bg-yellow-500/5">
                       <p className="text-[10px] text-yellow-500/80 font-extrabold uppercase tracking-wider">render.com Domains Hits</p>
-                      <p className="text-3xl font-black mt-1 font-mono text-yellow-400">{visitsData?.lwexCount ?? 0}</p>
-                      <p className="text-[9px] text-yellow-500/55 mt-1">Visits on or referred by lwex.onrender.com</p>
+                      <p className="text-3xl font-black mt-1 font-mono text-yellow-400">{(visitsData?.knexCount ?? visitsData?.lwexCount ?? 0)}</p>
+                      <p className="text-[9px] text-yellow-500/55 mt-1">Visits on or referred by knex / render</p>
                     </div>
                   </div>
 
@@ -3119,9 +3124,9 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast }:
                             </tr>
                           ) : (
                             visitsData.recentVisits.map((v: any) => {
-                              const isLwexSource = (v.host && v.host.includes('lwex.onrender.com')) || (v.referrer && v.referrer.includes('lwex.onrender.com'));
+                              const isKnexSource = (v.host && (v.host.includes('knex') || v.host.includes('lwex.onrender.com'))) || (v.referrer && (v.referrer.includes('knex') || v.referrer.includes('lwex.onrender.com')));
                               return (
-                                <tr key={v.id} className={`hover:bg-slate-200/20 dark:hover:bg-zinc-900/40 transition-colors ${isLwexSource ? 'bg-yellow-500/5' : ''}`}>
+                                <tr key={v.id} className={`hover:bg-slate-200/20 dark:hover:bg-zinc-900/40 transition-colors ${isKnexSource ? 'bg-yellow-500/5' : ''}`}>
                                   <td className="p-3 text-slate-900 dark:text-slate-200 whitespace-nowrap">
                                     {new Date(v.created_at).toLocaleString()}
                                   </td>
@@ -3142,7 +3147,7 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast }:
                                   </td>
                                   <td className="p-3 truncate max-w-[200px]" title={v.referrer}>
                                     {v.referrer ? (
-                                      <span className={v.referrer.includes('lwex.onrender.com') ? 'text-yellow-400 font-bold' : 'text-slate-400'}>
+                                      <span className={(v.referrer.includes('knex') || v.referrer.includes('lwex.onrender.com')) ? 'text-yellow-400 font-bold' : 'text-slate-400'}>
                                         {v.referrer}
                                       </span>
                                     ) : (

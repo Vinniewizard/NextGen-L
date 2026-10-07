@@ -49,6 +49,8 @@ export default function AuthModal({ isOpen, onClose, theme, onSuccess, initialVi
       if (event.data?.type === 'GOOGLE_AUTH_SUCCESS') {
         const { user, token } = event.data;
         if (user && token) {
+          localStorage.setItem('knex_current_user', JSON.stringify(user));
+          localStorage.setItem('knex_token', token);
           localStorage.setItem('lwex_current_user', JSON.stringify(user));
           localStorage.setItem('lwex_token', token);
           onSuccess(user);
@@ -190,6 +192,8 @@ export default function AuthModal({ isOpen, onClose, theme, onSuccess, initialVi
       .then((data) => {
         setSuccessMsg(data.message || 'Account created successfully! Welcome to Knex Trading.');
         setIsLoading(false);
+        localStorage.setItem('knex_current_user', JSON.stringify(data.user));
+        localStorage.setItem('knex_token', data.token);
         localStorage.setItem('lwex_current_user', JSON.stringify(data.user));
         localStorage.setItem('lwex_token', data.token);
         setTimeout(() => {
@@ -218,6 +222,8 @@ export default function AuthModal({ isOpen, onClose, theme, onSuccess, initialVi
       })
       .then((data) => {
         setIsLoading(false);
+        localStorage.setItem('knex_current_user', JSON.stringify(data.user));
+        localStorage.setItem('knex_token', data.token);
         localStorage.setItem('lwex_current_user', JSON.stringify(data.user));
         localStorage.setItem('lwex_token', data.token);
         onSuccess(data.user);

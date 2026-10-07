@@ -18,7 +18,7 @@ export interface Asset {
   description: string;
 }
 
-export type ContractType = 'rise-fall' | 'higher-lower' | 'touch-no-touch' | 'digit-over-under';
+export type ContractType = 'rise-fall' | 'higher-lower' | 'touch-no-touch' | 'digit-over-under' | 'digit-matches-differs' | 'digit-even-odd';
 
 export interface Tick {
   time: number;
@@ -31,14 +31,14 @@ export interface Contract {
   assetName: string;
   assetSymbol: string;
   type: ContractType;
-  direction: 'rise' | 'fall' | 'call' | 'put' | 'buy' | 'sell' | 'higher' | 'lower' | 'touch' | 'no-touch' | 'over' | 'under';
+  direction: 'rise' | 'fall' | 'call' | 'put' | 'buy' | 'sell' | 'higher' | 'lower' | 'touch' | 'no-touch' | 'over' | 'under' | 'matches' | 'differs' | 'even' | 'odd';
   stake: number;
   multiplier?: number;
   payout: number;
   basis: 'stake' | 'payout';
   barrier?: number; // visual or actual trigger level
   barrierOffset?: number; // e.g. +0.50
-  targetDigit?: number; // For digit-over-under (0-9)
+  targetDigit?: number; // For digit games (0-9)
   entryPrice: number;
   entryTime: number;
   duration: number; // count
@@ -62,7 +62,7 @@ export interface TradeHistoryItem {
   assetName: string;
   assetSymbol: string;
   type: ContractType;
-  direction: 'rise' | 'fall' | 'call' | 'put' | 'buy' | 'sell' | 'higher' | 'lower' | 'touch' | 'no-touch' | 'over' | 'under';
+  direction: 'rise' | 'fall' | 'call' | 'put' | 'buy' | 'sell' | 'higher' | 'lower' | 'touch' | 'no-touch' | 'over' | 'under' | 'matches' | 'differs' | 'even' | 'odd';
   stake: number;
   payout: number;
   profit: number;
