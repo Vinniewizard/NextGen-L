@@ -56,7 +56,7 @@ function convertQueryPlaceholders(query: string): string {
 function getSqliteInstance() {
   if (sqliteDbInstance) return sqliteDbInstance;
 
-  const dbPath = path.join(process.cwd(), 'lwex.db');
+  const dbPath = path.join(process.cwd(), 'knex.db');
   console.log(`[D1 Setup] Connecting to SQLite database at: ${dbPath}`);
 
   try {
@@ -443,6 +443,16 @@ function getD1Database() {
             coin TEXT NOT NULL,
             status TEXT DEFAULT 'open',
             chat_messages TEXT DEFAULT '[]',
+            created_at TEXT NOT NULL
+          );
+
+          CREATE TABLE IF NOT EXISTS p2p_notifications (
+            id TEXT PRIMARY KEY,
+            user_id TEXT NOT NULL,
+            title TEXT NOT NULL,
+            message TEXT NOT NULL,
+            type TEXT DEFAULT 'info',
+            is_read INTEGER DEFAULT 0,
             created_at TEXT NOT NULL
           );
 
@@ -2698,6 +2708,18 @@ Active technical indicator values: ${indicatorsString}.`}`;
           return res.status(409).json({
             success: false,
             message: 'This email or phone is already registered. Please enter your existing password to log in.'
+          });
+        }
+      }
+
+      if (deviceId) {
+        const deviceMatch = await db.prepare(
+          `SELECT user_id FROM device_registrations WHERE device_id = ? LIMIT 1`
+        ).bind(deviceId).first() as any;
+        if (deviceMatch) {
+          return res.status(409).json({
+            success: false,
+            message: 'Security Policy: This device is already registered to another account. Only one account per device is permitted. Please log in with your existing account.'
           });
         }
       }

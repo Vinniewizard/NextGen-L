@@ -194,8 +194,6 @@ export default function AuthModal({ isOpen, onClose, theme, onSuccess, initialVi
         setIsLoading(false);
         localStorage.setItem('knex_current_user', JSON.stringify(data.user));
         localStorage.setItem('knex_token', data.token);
-        localStorage.setItem('lwex_current_user', JSON.stringify(data.user));
-        localStorage.setItem('lwex_token', data.token);
         setTimeout(() => {
           onSuccess(data.user);
           onClose();
@@ -224,8 +222,6 @@ export default function AuthModal({ isOpen, onClose, theme, onSuccess, initialVi
         setIsLoading(false);
         localStorage.setItem('knex_current_user', JSON.stringify(data.user));
         localStorage.setItem('knex_token', data.token);
-        localStorage.setItem('lwex_current_user', JSON.stringify(data.user));
-        localStorage.setItem('lwex_token', data.token);
         onSuccess(data.user);
         onClose();
       })
