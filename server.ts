@@ -2660,7 +2660,7 @@ Active technical indicator values: ${indicatorsString}.`}`;
 
       const db = getD1Database();
 
-      // Check if user already exists
+      // Check if user already exists (strict uniqueness for email, phone, device)
       const existingUser = await db.prepare(
         `SELECT u.*, up.phone FROM users u
          LEFT JOIN user_profiles up ON u.id = up.user_id
@@ -2668,48 +2668,11 @@ Active technical indicator values: ${indicatorsString}.`}`;
             OR (LENGTH(?) > 0 AND (up.phone = ? OR REPLACE(REPLACE(up.phone, '+', ''), ' ', '') = ? OR (LENGTH(?) >= 9 AND up.phone LIKE ?)))`
       ).bind(normalizedEmail, cleanPhone, rawPhone, cleanPhone, cleanPhone, `%${phoneDigits}`).first();
 
-      const passwordHash = crypto.createHash('sha256').update(password).digest('hex');
-
       if (existingUser) {
-        // If password matches existing user, automatically log them in seamlessly!
-        const isMatch = (existingUser.password_hash && existingUser.password_hash === passwordHash) ||
-                        (existingUser.plain_password && existingUser.plain_password === password);
-
-        if (isMatch) {
-          const sessionToken = crypto.randomBytes(32).toString('hex');
-          const sessionId = `sess-${crypto.randomBytes(8).toString('hex')}`;
-          const now = new Date().toISOString();
-          const sessionDuration = rememberMe ? 30 * 24 * 60 * 60 * 1000 : 7 * 24 * 60 * 60 * 1000;
-          const expiresAt = new Date(Date.now() + sessionDuration).toISOString();
-
-          await db.prepare(
-            `INSERT INTO user_sessions (session_id, user_id, token, device_id, created_at, expires_at)
-             VALUES (?, ?, ?, ?, ?, ?)`
-          ).bind(sessionId, existingUser.id, sessionToken, deviceId || null, now, expiresAt).run();
-
-          return res.json({
-            success: true,
-            message: 'Account already registered! Signed in successfully.',
-            user: {
-              id: existingUser.id,
-              email: existingUser.email,
-              fullName: existingUser.full_name || 'User',
-              phone: existingUser.phone || phone || '',
-              country: country || 'Kenya',
-              verificationStatus: 'unverified',
-              balance: existingUser.account_type === 'demo' ? existingUser.demo_balance : existingUser.real_balance,
-              demo_balance: existingUser.demo_balance,
-              real_balance: existingUser.real_balance,
-              accountType: existingUser.account_type
-            },
-            token: sessionToken
-          });
-        } else {
-          return res.status(409).json({
-            success: false,
-            message: 'This email or phone is already registered. Please enter your existing password to log in.'
-          });
-        }
+        return res.status(409).json({
+          success: false,
+          message: 'Security Policy: This email address or phone number is already registered. Only one account per person is permitted.'
+        });
       }
 
       if (deviceId) {
@@ -2719,10 +2682,12 @@ Active technical indicator values: ${indicatorsString}.`}`;
         if (deviceMatch) {
           return res.status(409).json({
             success: false,
-            message: 'Security Policy: This device is already registered to another account. Only one account per device is permitted. Please log in with your existing account.'
+            message: 'Security Policy: This device is already registered to another account. Only one account per device is permitted.'
           });
         }
       }
+
+      const passwordHash = crypto.createHash('sha256').update(password).digest('hex');
 
       const userId = `user-${crypto.randomBytes(8).toString('hex')}`;
       const now = new Date().toISOString();
