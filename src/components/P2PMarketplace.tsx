@@ -64,7 +64,7 @@ export default function P2PMarketplace({ currentUser, isDark, onBalanceUpdate, o
   const getEffectiveUser = () => {
     if (currentUser && currentUser.id) return currentUser;
     try {
-      const saved = localStorage.getItem('lwex_p2p_demo_user');
+      const saved = localStorage.getItem('knex_p2p_demo_user') || localStorage.getItem('lwex_p2p_demo_user');
       if (saved) return JSON.parse(saved);
       const demo = {
         id: 'trader_' + Math.random().toString(36).substring(2, 9),
@@ -73,6 +73,7 @@ export default function P2PMarketplace({ currentUser, isDark, onBalanceUpdate, o
         is_verified: true,
         real_balance: 5000
       };
+      localStorage.setItem('knex_p2p_demo_user', JSON.stringify(demo));
       localStorage.setItem('lwex_p2p_demo_user', JSON.stringify(demo));
       return demo;
     } catch {
@@ -121,7 +122,7 @@ export default function P2PMarketplace({ currentUser, isDark, onBalanceUpdate, o
   // Poll P2P notifications every 3 seconds for instant merchant view & trade alerts
   useEffect(() => {
     const checkNotifications = async () => {
-      const token = localStorage.getItem('lwex_token');
+      const token = localStorage.getItem('knex_token') || localStorage.getItem('lwex_token');
       if (!token) return;
 
       try {
@@ -142,7 +143,7 @@ export default function P2PMarketplace({ currentUser, isDark, onBalanceUpdate, o
   }, []);
 
   const handleViewMerchantProfile = (sellerId: string, merchantName: string) => {
-    const token = localStorage.getItem('lwex_token');
+    const token = localStorage.getItem('knex_token') || localStorage.getItem('lwex_token');
     fetch('/api/p2p/profile/view', {
       method: 'POST',
       headers: {
