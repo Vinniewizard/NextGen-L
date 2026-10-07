@@ -160,6 +160,20 @@ function getSqliteInstance() {
     ensureSqliteColumn("user_profiles", "google_name", "TEXT");
     ensureSqliteColumn("user_profiles", "google_picture", "TEXT");
     ensureSqliteColumn("user_profiles", "google_id", "TEXT");
+    ensureSqliteColumn("p2p_orders", "paymentMethod", "TEXT");
+    ensureSqliteColumn("p2p_orders", "required_kyc", "INTEGER DEFAULT 0");
+    ensureSqliteColumn("p2p_orders", "required_min_trades", "INTEGER DEFAULT 0");
+    ensureSqliteColumn("p2p_orders", "terms", "TEXT DEFAULT ''");
+    ensureSqliteColumn("p2p_orders", "merchant_name", "TEXT");
+    ensureSqliteColumn("p2p_orders", "min_limit", "REAL DEFAULT 10.0");
+    ensureSqliteColumn("p2p_orders", "max_limit", "REAL DEFAULT 5000.0");
+    ensureSqliteColumn("p2p_orders", "payment_details", "TEXT");
+    ensureSqliteColumn("p2p_orders", "fiat_currency", "TEXT DEFAULT 'USD'");
+    ensureSqliteColumn("p2p_orders", "is_verified", "INTEGER DEFAULT 1");
+    ensureSqliteColumn("p2p_orders", "completion_rate", "REAL DEFAULT 100.0");
+    ensureSqliteColumn("p2p_orders", "orders_count", "INTEGER DEFAULT 1");
+    ensureSqliteColumn("p2p_orders", "avg_release_time", "INTEGER DEFAULT 5");
+    ensureSqliteColumn("p2p_orders", "positive_rating", "REAL DEFAULT 100.0");
 
     rawDb.exec(`
       CREATE TABLE IF NOT EXISTS device_registrations (
@@ -432,6 +446,21 @@ function getD1Database() {
             status TEXT DEFAULT 'open',
             created_at TEXT NOT NULL
           );
+
+          ALTER TABLE p2p_orders ADD COLUMN IF NOT EXISTS paymentMethod TEXT;
+          ALTER TABLE p2p_orders ADD COLUMN IF NOT EXISTS required_kyc INTEGER DEFAULT 0;
+          ALTER TABLE p2p_orders ADD COLUMN IF NOT EXISTS required_min_trades INTEGER DEFAULT 0;
+          ALTER TABLE p2p_orders ADD COLUMN IF NOT EXISTS terms TEXT DEFAULT '';
+          ALTER TABLE p2p_orders ADD COLUMN IF NOT EXISTS merchant_name TEXT;
+          ALTER TABLE p2p_orders ADD COLUMN IF NOT EXISTS min_limit REAL DEFAULT 10.0;
+          ALTER TABLE p2p_orders ADD COLUMN IF NOT EXISTS max_limit REAL DEFAULT 5000.0;
+          ALTER TABLE p2p_orders ADD COLUMN IF NOT EXISTS payment_details TEXT;
+          ALTER TABLE p2p_orders ADD COLUMN IF NOT EXISTS fiat_currency TEXT DEFAULT 'USD';
+          ALTER TABLE p2p_orders ADD COLUMN IF NOT EXISTS is_verified INTEGER DEFAULT 1;
+          ALTER TABLE p2p_orders ADD COLUMN IF NOT EXISTS completion_rate REAL DEFAULT 100.0;
+          ALTER TABLE p2p_orders ADD COLUMN IF NOT EXISTS orders_count INTEGER DEFAULT 1;
+          ALTER TABLE p2p_orders ADD COLUMN IF NOT EXISTS avg_release_time INTEGER DEFAULT 5;
+          ALTER TABLE p2p_orders ADD COLUMN IF NOT EXISTS positive_rating REAL DEFAULT 100.0;
 
           CREATE TABLE IF NOT EXISTS p2p_trades (
             id TEXT PRIMARY KEY,
