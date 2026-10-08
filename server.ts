@@ -3826,19 +3826,23 @@ Active technical indicator values: ${indicatorsString}.`}`;
       
       const now = new Date().toISOString();
       const messages = JSON.parse(trade.chat_messages || '[]');
-      messages.push({
+      const newMsg = {
         id: crypto.randomUUID(),
         sender: userId,
         senderEmail,
         text,
         timestamp: now
-      });
+      };
+      messages.push(newMsg);
       
       if (db.prepare) {
         await db.prepare("UPDATE p2p_trades SET chat_messages = ? WHERE id = ?").bind(JSON.stringify(messages), req.params.id).run();
       } else {
         await db.query("UPDATE p2p_trades SET chat_messages = $1 WHERE id = $2", [JSON.stringify(messages), req.params.id]);
       }
+
+      broadcastToUser(trade.buyer_id, { type: 'P2P_TRADE_MESSAGE', tradeId: req.params.id, message: newMsg, messages });
+      broadcastToUser(trade.seller_id, { type: 'P2P_TRADE_MESSAGE', tradeId: req.params.id, message: newMsg, messages });
       
       return res.json({ success: true, messages });
     } catch (e: any) {
@@ -5587,6 +5591,42 @@ Active technical indicator values: ${indicatorsString}.`}`;
       await db.prepare("UPDATE p2p_trades SET chat_messages = ? WHERE id = ?").bind(JSON.stringify(msgs), id).run();
 
       return res.json({ success: true, message: `P2P Dispute resolved successfully (${action}).` });
+    } catch (err: any) {
+      return res.status(500).json({ success: false, message: err.message });
+    }
+  });
+
+  // Admin endpoint - Send chat message to P2P trade room
+  app.post('/api/admin/p2p/trades/:id/chat', async (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    try {
+      const adminKey = req.headers['x-admin-key'];
+      if (adminKey !== process.env.ADMIN_KEY && adminKey !== 'admin-secret-key') {
+        return res.status(403).json({ success: false, message: 'Unauthorized' });
+      }
+
+      const { text } = req.body;
+      const db = getD1Database();
+      const trade = await db.prepare("SELECT * FROM p2p_trades WHERE id = ?").bind(req.params.id).first() as any;
+      if (!trade) return res.status(404).json({ success: false, message: 'Trade not found' });
+
+      const now = new Date().toISOString();
+      const messages = JSON.parse(trade.chat_messages || '[]');
+      const newMsg = {
+        id: crypto.randomUUID(),
+        sender: 'admin',
+        senderEmail: '🛡️ Admin / Moderator Support',
+        text,
+        timestamp: now
+      };
+      messages.push(newMsg);
+
+      await db.prepare("UPDATE p2p_trades SET chat_messages = ? WHERE id = ?").bind(JSON.stringify(messages), req.params.id).run();
+
+      broadcastToUser(trade.buyer_id, { type: 'P2P_TRADE_MESSAGE', tradeId: req.params.id, message: newMsg, messages });
+      broadcastToUser(trade.seller_id, { type: 'P2P_TRADE_MESSAGE', tradeId: req.params.id, message: newMsg, messages });
+
+      return res.json({ success: true, messages });
     } catch (err: any) {
       return res.status(500).json({ success: false, message: err.message });
     }

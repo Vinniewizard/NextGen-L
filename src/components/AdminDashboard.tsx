@@ -109,6 +109,8 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast }:
   const [p2pTrades, setP2pTrades] = useState<any[]>([]);
   const [selectedDisputeChat, setSelectedDisputeChat] = useState<any | null>(null);
   const [disputeNote, setDisputeNote] = useState('');
+  const [adminChatText, setAdminChatText] = useState('');
+  const [isSendingAdminChat, setIsSendingAdminChat] = useState(false);
   const [isResolvingDispute, setIsResolvingDispute] = useState(false);
   const [visitsData, setVisitsData] = useState<{
     visitsCount: number;
@@ -3207,22 +3209,96 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast }:
                   </div>
                 </div>
 
-                <div className="text-[10px] font-black uppercase text-slate-500 tracking-wider">Audit Chat Log</div>
-                <div className="space-y-2 max-h-48 overflow-y-auto p-2 bg-slate-900 rounded border border-slate-800 text-xs">
+                <div className="flex items-center justify-between">
+                  <div className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Live Audit Chat & Instant Messaging</div>
+                  <span className="text-[10px] text-emerald-400 font-bold">● Instant WS Sync Active</span>
+                </div>
+                <div className="space-y-2 max-h-48 overflow-y-auto p-2.5 bg-slate-950 rounded-lg border border-slate-800 text-xs shadow-inner">
                   {(() => {
                     let msgs: any[] = [];
                     try { msgs = JSON.parse(selectedDisputeChat.chat_messages || '[]'); } catch (e) {}
-                    if (msgs.length === 0) return <p className="text-slate-500 italic text-center">No chat messages exchanged.</p>;
-                    return msgs.map((m: any, idx: number) => (
-                      <div key={idx} className={`p-2 rounded ${m.sender === 'system' ? 'bg-indigo-950/60 border border-indigo-800/40 text-indigo-300' : 'bg-slate-800/80 text-slate-200'}`}>
-                        <div className="flex justify-between text-[9px] text-slate-400 font-bold mb-0.5">
-                          <span>{m.sender}</span>
-                          <span>{m.timestamp ? new Date(m.timestamp).toLocaleTimeString() : ''}</span>
+                    if (msgs.length === 0) return <p className="text-slate-500 italic text-center py-4">No chat messages exchanged yet.</p>;
+                    return msgs.map((m: any, idx: number) => {
+                      const isAdmin = m.sender === 'admin' || m.sender === 'system';
+                      return (
+                        <div key={idx} className={`p-2.5 rounded-lg border ${
+                          isAdmin ? 'bg-indigo-950/60 border-indigo-800/60 text-indigo-200' : 'bg-slate-900 border-slate-800 text-slate-200'
+                        }`}>
+                          <div className="flex justify-between text-[10px] text-slate-400 font-bold mb-1">
+                            <span className={isAdmin ? 'text-indigo-400 font-extrabold' : 'text-yellow-400'}>{m.senderEmail || m.sender}</span>
+                            <span>{m.timestamp ? new Date(m.timestamp).toLocaleTimeString() : ''}</span>
+                          </div>
+                          <p className="text-xs leading-relaxed">{m.text}</p>
                         </div>
-                        <p className="text-xs">{m.text}</p>
-                      </div>
-                    ));
+                      );
+                    });
                   })()}
+                </div>
+
+                {/* Admin Direct Message Input */}
+                <div className="flex gap-2 pt-1">
+                  <input
+                    type="text"
+                    value={adminChatText}
+                    onChange={(e) => setAdminChatText(e.target.value)}
+                    onKeyDown={async (e) => {
+                      if (e.key === 'Enter' && adminChatText.trim() && !isSendingAdminChat) {
+                        setIsSendingAdminChat(true);
+                        try {
+                          const res = await fetch(`/api/admin/p2p/trades/${selectedDisputeChat.id}/chat`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
+                            body: JSON.stringify({ text: adminChatText.trim() })
+                          });
+                          const data = await res.json();
+                          if (data.success) {
+                            setSelectedDisputeChat({ ...selectedDisputeChat, chat_messages: JSON.stringify(data.messages) });
+                            setAdminChatText('');
+                            triggerToast('Message sent instantly to buyer & seller!', true);
+                            fetchData(adminKey);
+                          } else {
+                            triggerToast(data.message || 'Failed to send message', false);
+                          }
+                        } catch (err: any) {
+                          triggerToast('Error sending message: ' + err.message, false);
+                        } finally {
+                          setIsSendingAdminChat(false);
+                        }
+                      }
+                    }}
+                    placeholder="Type message as Admin/Moderator to buyer & seller..."
+                    className="flex-1 bg-slate-950 border border-slate-800 rounded p-2 text-xs text-slate-100 focus:outline-none focus:border-indigo-500"
+                  />
+                  <button
+                    disabled={isSendingAdminChat || !adminChatText.trim()}
+                    onClick={async () => {
+                      if (!adminChatText.trim()) return;
+                      setIsSendingAdminChat(true);
+                      try {
+                        const res = await fetch(`/api/admin/p2p/trades/${selectedDisputeChat.id}/chat`, {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
+                          body: JSON.stringify({ text: adminChatText.trim() })
+                        });
+                        const data = await res.json();
+                        if (data.success) {
+                          setSelectedDisputeChat({ ...selectedDisputeChat, chat_messages: JSON.stringify(data.messages) });
+                          setAdminChatText('');
+                          triggerToast('Message sent instantly to buyer & seller!', true);
+                          fetchData(adminKey);
+                        } else {
+                          triggerToast(data.message || 'Failed to send message', false);
+                        }
+                      } catch (err: any) {
+                        triggerToast('Error sending message: ' + err.message, false);
+                      } finally {
+                        setIsSendingAdminChat(false);
+                      }
+                    }}
+                    className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold text-xs rounded cursor-pointer transition"
+                  >
+                    Send
+                  </button>
                 </div>
 
                 <div className="space-y-1.5 pt-2">
@@ -3231,7 +3307,7 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast }:
                     type="text"
                     value={disputeNote}
                     onChange={(e) => setDisputeNote(e.target.value)}
-                    placeholder="e.g., M-Pesa receipt verified, payment received by merchant."
+                    placeholder="e.g., Bank statement verified, payment confirmed received by merchant."
                     className="w-full bg-slate-950 border border-slate-800 rounded p-2 text-xs text-slate-100 focus:outline-none focus:border-yellow-500"
                   />
                 </div>
