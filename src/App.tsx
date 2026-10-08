@@ -136,35 +136,35 @@ export default function App() {
   const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(false);
 
   useEffect(() => {
-    if (!localStorage.getItem('lwex_welcome_shown')) {
+    if (!localStorage.getItem('knex_welcome_shown')) {
       setIsWelcomeModalOpen(true);
-      localStorage.setItem('lwex_welcome_shown', 'true');
+      localStorage.setItem('knex_welcome_shown', 'true');
     }
   }, []);
 
   // Account states: Loaded from storage
   const [currentUser, setCurrentUser] = useState<any>(() => {
     try {
-      const version = localStorage.getItem('lwex_version');
+      const version = localStorage.getItem('knex_version');
       if (version !== APP_VERSION) {
         // Clear all storage on version change
         Object.keys(localStorage).forEach(key => {
-          if (key.startsWith('lwex_')) localStorage.removeItem(key);
+          if (key.startsWith('knex_')) localStorage.removeItem(key);
         });
-        localStorage.setItem('lwex_version', APP_VERSION);
+        localStorage.setItem('knex_version', APP_VERSION);
         return null;
       }
-      const saved = localStorage.getItem('lwex_current_user');
+      const saved = localStorage.getItem('knex_current_user');
       if (saved) return JSON.parse(saved);
     } catch (e) {
-      localStorage.removeItem('lwex_current_user');
+      localStorage.removeItem('knex_current_user');
     }
     return null;
   });
 
   // Validate session against database on startup
   useEffect(() => {
-    const token = localStorage.getItem('lwex_token');
+    const token = localStorage.getItem('knex_token');
     if (token) {
       fetch('/api/auth/verify-session', {
         headers: { Authorization: `Bearer ${token}` }
@@ -173,11 +173,11 @@ export default function App() {
       .then(data => {
         if (data && data.success && data.user) {
           setCurrentUser(data.user);
-          localStorage.setItem('lwex_current_user', JSON.stringify(data.user));
+          localStorage.setItem('knex_current_user', JSON.stringify(data.user));
         } else if (data && data.valid === false) {
           setCurrentUser(null);
-          localStorage.removeItem('lwex_current_user');
-          localStorage.removeItem('lwex_token');
+          localStorage.removeItem('knex_current_user');
+          localStorage.removeItem('knex_token');
         }
       })
       .catch(err => console.warn('Session verification notice:', err?.message || err));
@@ -207,7 +207,7 @@ export default function App() {
   }, [currentUser?.id]);
 
   const [account, setAccount] = useState<Account>(() => {
-    const saved = localStorage.getItem('lwex_account');
+    const saved = localStorage.getItem('knex_account');
     let initialState: Account = {
       mode: 'demo',
       balance: 10000.00,
@@ -231,8 +231,8 @@ export default function App() {
     }
 
     // Enforce admin constraints on initial load
-    const demoEnabled = JSON.parse(localStorage.getItem('lwex_admin_demo_enabled') ?? 'true');
-    const realEnabled = JSON.parse(localStorage.getItem('lwex_admin_real_enabled') ?? 'true');
+    const demoEnabled = JSON.parse(localStorage.getItem('knex_admin_demo_enabled') ?? 'true');
+    const realEnabled = JSON.parse(localStorage.getItem('knex_admin_real_enabled') ?? 'true');
 
     if (initialState.mode === 'demo' && !demoEnabled && realEnabled) {
         return { ...initialState, mode: 'real' };
@@ -244,12 +244,12 @@ export default function App() {
   });
 
   const [demoAccountBalance, setDemoAccountBalance] = useState<number>(() => {
-    const saved = localStorage.getItem('lwex_demo_balance');
+    const saved = localStorage.getItem('knex_demo_balance');
     return saved !== null ? Number(saved) : 10000.00;
   });
 
   const [realAccountBalance, setRealAccountBalance] = useState<number>(() => {
-    const saved = localStorage.getItem('lwex_real_balance');
+    const saved = localStorage.getItem('knex_real_balance');
     return saved !== null ? Number(saved) : 1000.00;
   });
 
@@ -258,10 +258,10 @@ export default function App() {
     setAccount((prev) => {
       if (prev.mode === 'demo') {
         setDemoAccountBalance(clamped);
-        localStorage.setItem('lwex_demo_balance', String(clamped));
+        localStorage.setItem('knex_demo_balance', String(clamped));
       } else {
         setRealAccountBalance(clamped);
-        localStorage.setItem('lwex_real_balance', String(clamped));
+        localStorage.setItem('knex_real_balance', String(clamped));
       }
       return { ...prev, balance: clamped };
     });
@@ -342,7 +342,7 @@ export default function App() {
   useEffect(() => {
     // Only run walkthrough for actual users (not demo) if they haven't seen it
     if (currentUser) {
-      const hasSeen = localStorage.getItem(`lwex_walkthrough_seen_${walkthroughVersion}_${currentUser.id}`);
+      const hasSeen = localStorage.getItem(`knex_walkthrough_seen_${walkthroughVersion}_${currentUser.id}`);
       if (!hasSeen) {
         setRunWalkthrough(true);
       }
@@ -352,13 +352,13 @@ export default function App() {
   const handleWalkthroughEnd = () => {
     setRunWalkthrough(false);
     if (currentUser) {
-      localStorage.setItem(`lwex_walkthrough_seen_${walkthroughVersion}_${currentUser.id}`, 'true');
+      localStorage.setItem(`knex_walkthrough_seen_${walkthroughVersion}_${currentUser.id}`, 'true');
     }
   };
 
   // Load initial context for partitioning to prevent cross-user and cross-mode leakage
   const initialUser = (() => {
-    const saved = localStorage.getItem('lwex_current_user');
+    const saved = localStorage.getItem('knex_current_user');
     if (saved) {
       try {
         return JSON.parse(saved);
@@ -368,7 +368,7 @@ export default function App() {
   })();
 
   const initialAccountMode = (() => {
-    const saved = localStorage.getItem('lwex_account');
+    const saved = localStorage.getItem('knex_account');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -393,7 +393,7 @@ export default function App() {
   });
   const [assetsRegistry, setAssetsRegistry] = useState<Asset[]>(ASSETSList);
   const [assetsTicksMap, setAssetsTicksMap] = useState<Record<string, Tick[]>>(() => {
-    const saved = localStorage.getItem(`lwex_ticks_history_v2_${initialPartitionId}`);
+    const saved = localStorage.getItem(`knex_ticks_history_v2_${initialPartitionId}`);
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -421,7 +421,7 @@ export default function App() {
 
   // Contracts & History Log portfolios - Isolate using partition-specific keys (user + mode)
   const [activeContracts, setActiveContracts] = useState<Contract[]>(() => {
-    const saved = localStorage.getItem(`lwex_active_contracts_${initialPartitionId}`) || localStorage.getItem('lwex_active_contracts');
+    const saved = localStorage.getItem(`knex_active_contracts_${initialPartitionId}`) || localStorage.getItem('knex_active_contracts');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -435,7 +435,7 @@ export default function App() {
     return [];
   });
   const [tradeHistory, setTradeHistory] = useState<TradeHistoryItem[]>(() => {
-    const saved = localStorage.getItem(`lwex_history_${initialPartitionId}`) || localStorage.getItem('lwex_history');
+    const saved = localStorage.getItem(`knex_history_${initialPartitionId}`) || localStorage.getItem('knex_history');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -450,7 +450,7 @@ export default function App() {
   });
 
   const [priceAlerts, setPriceAlerts] = useState<PriceAlert[]>(() => {
-    const saved = localStorage.getItem(`lwex_price_alerts_${initialPartitionId}`) || localStorage.getItem('lwex_price_alerts');
+    const saved = localStorage.getItem(`knex_price_alerts_${initialPartitionId}`) || localStorage.getItem('knex_price_alerts');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -465,7 +465,7 @@ export default function App() {
   });
 
   const [pendingLimitOrders, setPendingLimitOrders] = useState<PendingLimitOrder[]>(() => {
-    const saved = localStorage.getItem(`lwex_pending_limit_orders_${initialPartitionId}`);
+    const saved = localStorage.getItem(`knex_pending_limit_orders_${initialPartitionId}`);
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -482,7 +482,7 @@ export default function App() {
   const pendingLimitOrdersRef = useRef(pendingLimitOrders);
   useEffect(() => {
     pendingLimitOrdersRef.current = pendingLimitOrders;
-    localStorage.setItem(`lwex_pending_limit_orders_${initialPartitionId}`, JSON.stringify(pendingLimitOrders));
+    localStorage.setItem(`knex_pending_limit_orders_${initialPartitionId}`, JSON.stringify(pendingLimitOrders));
   }, [pendingLimitOrders, initialPartitionId]);
 
   const prevPartitionIdRef = useRef<string>(initialPartitionId);
@@ -530,7 +530,7 @@ export default function App() {
           ticks.slice(-500) // Keep only the last 500 ticks per asset
         ])
       );
-      localStorage.setItem(`lwex_ticks_history_v2_${currentPartitionId}`, JSON.stringify(ticksToSave));
+      localStorage.setItem(`knex_ticks_history_v2_${currentPartitionId}`, JSON.stringify(ticksToSave));
     }, 5000); // Saves once every 5 seconds to prevent performance degradation
 
     return () => clearInterval(interval);
@@ -834,7 +834,7 @@ export default function App() {
     } else if (res.status === 401 || res.status === 404) {
       // Clear all storage on auth failure or missing user to ensure fresh state without reload loops
       Object.keys(localStorage).forEach(key => {
-        if (key.startsWith('lwex_') && key !== 'lwex_version') localStorage.removeItem(key);
+        if (key.startsWith('knex_') && key !== 'knex_version') localStorage.removeItem(key);
       });
       setCurrentUser(null);
     }
@@ -897,7 +897,7 @@ export default function App() {
     
     // If empty ticks map, try loading it from localStorage or initialize
     if (Object.keys(ticksMap).length === 0) {
-      const savedTicks = localStorage.getItem(`lwex_ticks_history_${targetPartitionId}`);
+      const savedTicks = localStorage.getItem(`knex_ticks_history_${targetPartitionId}`);
       if (savedTicks) {
         try {
           ticksMap = JSON.parse(savedTicks);
@@ -928,7 +928,7 @@ export default function App() {
       return;
     }
     
-    console.log(`[LWEX Backfill] Gap detected: ${Math.floor(gapMs / 1000)} seconds. Backfilling history and settling offline trades...`);
+    console.log(`[KNEX Backfill] Gap detected: ${Math.floor(gapMs / 1000)} seconds. Backfilling history and settling offline trades...`);
     
     // 2. Load contracts and history
     let contracts = initialContracts || [...activeContractsRef.current];
@@ -1334,9 +1334,9 @@ export default function App() {
       finalTicksMap[asset.id] = (accumulatedTicks[asset.id] || []).slice(-6000);
     });
 
-    localStorage.setItem(`lwex_ticks_history_${targetPartitionId}`, JSON.stringify(finalTicksMap));
-    localStorage.setItem(`lwex_active_contracts_${targetPartitionId}`, JSON.stringify(contracts));
-    localStorage.setItem(`lwex_history_${targetPartitionId}`, JSON.stringify(history));
+    localStorage.setItem(`knex_ticks_history_${targetPartitionId}`, JSON.stringify(finalTicksMap));
+    localStorage.setItem(`knex_active_contracts_${targetPartitionId}`, JSON.stringify(contracts));
+    localStorage.setItem(`knex_history_${targetPartitionId}`, JSON.stringify(history));
 
     setAssetsTicksMap(finalTicksMap);
     setActiveContracts(contracts);
@@ -1388,7 +1388,7 @@ export default function App() {
                   return prevUser;
                 }
                 const updated = { ...prevUser, demo_balance: demoBal, real_balance: realBal };
-                localStorage.setItem('lwex_current_user', JSON.stringify(updated));
+                localStorage.setItem('knex_current_user', JSON.stringify(updated));
                 return updated;
               }
               return prevUser;
@@ -1397,7 +1397,7 @@ export default function App() {
           }
         } else if (res.status === 401 || res.status === 404) {
           setCurrentUser(null);
-          localStorage.removeItem('lwex_current_user');
+          localStorage.removeItem('knex_current_user');
         }
       } catch (err: any) {
         // Gracefully handle network hiccups / offline / dev server restarts without unhandled errors
@@ -1417,10 +1417,10 @@ export default function App() {
     isSyncingFromServerRef.current = false;
 
     // Load stored data for this specific partition
-    const savedContracts = localStorage.getItem(`lwex_active_contracts_${targetPartitionId}`);
-    const savedHistory = localStorage.getItem(`lwex_history_${targetPartitionId}`);
-    const savedAlerts = localStorage.getItem(`lwex_price_alerts_${targetPartitionId}`);
-    const savedTicks = localStorage.getItem(`lwex_ticks_history_v2_${targetPartitionId}`) || localStorage.getItem(`lwex_ticks_history_${targetPartitionId}`);
+    const savedContracts = localStorage.getItem(`knex_active_contracts_${targetPartitionId}`);
+    const savedHistory = localStorage.getItem(`knex_history_${targetPartitionId}`);
+    const savedAlerts = localStorage.getItem(`knex_price_alerts_${targetPartitionId}`);
+    const savedTicks = localStorage.getItem(`knex_ticks_history_v2_${targetPartitionId}`) || localStorage.getItem(`knex_ticks_history_${targetPartitionId}`);
 
     let nextContracts: Contract[] = [];
     let nextHistory: TradeHistoryItem[] = [];
@@ -1474,7 +1474,7 @@ export default function App() {
     } else {
       // First time loading partition or user has no saved ticks, trigger initial generation
       const initialMap = initializeAssetHistory(ASSETSList);
-      localStorage.setItem(`lwex_ticks_history_v2_${targetPartitionId}`, JSON.stringify(initialMap));
+      localStorage.setItem(`knex_ticks_history_v2_${targetPartitionId}`, JSON.stringify(initialMap));
       setAssetsTicksMap(initialMap);
       gapTriggeredBackfill = true;
     }
@@ -1526,7 +1526,7 @@ export default function App() {
     } else {
       // Guest fallback: preserve stored demo balance if exists
       const currAcc = accountRef.current;
-      const storedDemo = localStorage.getItem('lwex_demo_balance');
+      const storedDemo = localStorage.getItem('knex_demo_balance');
       const fallbackBal = storedDemo !== null && !isNaN(Number(storedDemo)) ? Number(storedDemo) : (currAcc.balance || 10000.00);
       if (currAcc.mode !== 'demo' || currAcc.id !== 'demo-temp-acc') {
         setAccount({
@@ -1620,7 +1620,7 @@ export default function App() {
 
   const loadSettledContractIds = (): Set<string> => {
     try {
-      const saved = localStorage.getItem('lwex_settled_contract_ids');
+      const saved = localStorage.getItem('knex_settled_contract_ids');
       return saved ? new Set(JSON.parse(saved)) : new Set();
     } catch (e) {
       return new Set();
@@ -1632,7 +1632,7 @@ export default function App() {
   const markContractSettled = (id: string) => {
     settledContractIdsRef.current.add(id);
     try {
-      localStorage.setItem('lwex_settled_contract_ids', JSON.stringify(Array.from(settledContractIdsRef.current)));
+      localStorage.setItem('knex_settled_contract_ids', JSON.stringify(Array.from(settledContractIdsRef.current)));
     } catch (e) {}
   };
 
@@ -1703,7 +1703,7 @@ export default function App() {
 
   // Persist state changes in account-specific partitions and push to server
   useEffect(() => {
-    localStorage.setItem('lwex_account', JSON.stringify(account));
+    localStorage.setItem('knex_account', JSON.stringify(account));
     
     // Only write data if they belong together and match the current active partition ID
     // This blocks the race condition during login/logout/switch transitions
@@ -1712,10 +1712,10 @@ export default function App() {
     const currentPartitionId = `${currentUserIdStr}_${currentMode}`;
 
     if (currentPartitionId === prevPartitionIdRef.current) {
-      localStorage.setItem(`lwex_history_${currentPartitionId}`, JSON.stringify(tradeHistory));
-      localStorage.setItem(`lwex_active_contracts_${currentPartitionId}`, JSON.stringify(activeContracts));
-      localStorage.setItem(`lwex_price_alerts_${currentPartitionId}`, JSON.stringify(priceAlerts));
-      localStorage.setItem(`lwex_pending_limit_orders_${currentPartitionId}`, JSON.stringify(pendingLimitOrders));
+      localStorage.setItem(`knex_history_${currentPartitionId}`, JSON.stringify(tradeHistory));
+      localStorage.setItem(`knex_active_contracts_${currentPartitionId}`, JSON.stringify(activeContracts));
+      localStorage.setItem(`knex_price_alerts_${currentPartitionId}`, JSON.stringify(priceAlerts));
+      localStorage.setItem(`knex_pending_limit_orders_${currentPartitionId}`, JSON.stringify(pendingLimitOrders));
 
       const stripVolatileLocal = (contracts: Contract[]) => {
         return contracts.map(c => {
@@ -1744,14 +1744,14 @@ export default function App() {
       }
     }
     
-    localStorage.setItem('lwex_demo_balance', String(demoAccountBalance));
-    localStorage.setItem('lwex_real_balance', String(realAccountBalance));
+    localStorage.setItem('knex_demo_balance', String(demoAccountBalance));
+    localStorage.setItem('knex_real_balance', String(realAccountBalance));
     if (currentUser) {
-      localStorage.setItem('lwex_current_user', JSON.stringify(currentUser));
-      localStorage.removeItem('lwex_logged_out');
+      localStorage.setItem('knex_current_user', JSON.stringify(currentUser));
+      localStorage.removeItem('knex_logged_out');
     } else {
-      localStorage.removeItem('lwex_current_user');
-      localStorage.setItem('lwex_logged_out', 'true');
+      localStorage.removeItem('knex_current_user');
+      localStorage.setItem('knex_logged_out', 'true');
     }
   }, [account, tradeHistory, activeContracts, demoAccountBalance, realAccountBalance, currentUser, priceAlerts, pendingLimitOrders]);
 
@@ -1850,7 +1850,7 @@ export default function App() {
                 maxWinLimit: data.userOverride.maxWinLimit,
                 maxLossLimit: data.userOverride.maxLossLimit
               };
-              localStorage.setItem('lwex_current_user', JSON.stringify(updated));
+              localStorage.setItem('knex_current_user', JSON.stringify(updated));
               return updated;
             });
             
@@ -2000,7 +2000,7 @@ export default function App() {
 
     // 3. Clear localStorage for the current partition
     const currentPartitionId = currentUser ? currentUser.id : 'guest';
-    localStorage.removeItem(`lwex_active_contracts_${currentPartitionId}_demo`);
+    localStorage.removeItem(`knex_active_contracts_${currentPartitionId}_demo`);
 
     // 4. Trigger warning toast info
     triggerToast("Active guest trading simulation has expired. Portfolio was cleared to free up resources.", false);
@@ -2155,17 +2155,17 @@ export default function App() {
 
   // Switchees Demowrithe wallets
   // Admin control: Demo/Real visibility
-  const [demoModeEnabled, setDemoModeEnabled] = useState(() => JSON.parse(localStorage.getItem('lwex_admin_demo_enabled') ?? 'true'));
-  const [realModeEnabled, setRealModeEnabled] = useState(() => JSON.parse(localStorage.getItem('lwex_admin_real_enabled') ?? 'true'));
+  const [demoModeEnabled, setDemoModeEnabled] = useState(() => JSON.parse(localStorage.getItem('knex_admin_demo_enabled') ?? 'true'));
+  const [realModeEnabled, setRealModeEnabled] = useState(() => JSON.parse(localStorage.getItem('knex_admin_real_enabled') ?? 'true'));
 
   useEffect(() => {
     const handleStorageChange = () => {
-      setDemoModeEnabled(JSON.parse(localStorage.getItem('lwex_admin_demo_enabled') ?? 'true'));
-      setRealModeEnabled(JSON.parse(localStorage.getItem('lwex_admin_real_enabled') ?? 'true'));
+      setDemoModeEnabled(JSON.parse(localStorage.getItem('knex_admin_demo_enabled') ?? 'true'));
+      setRealModeEnabled(JSON.parse(localStorage.getItem('knex_admin_real_enabled') ?? 'true'));
     };
 
-    window.addEventListener('lwex-settings-changed', handleStorageChange);
-    return () => window.removeEventListener('lwex-settings-changed', handleStorageChange);
+    window.addEventListener('knex-settings-changed', handleStorageChange);
+    return () => window.removeEventListener('knex-settings-changed', handleStorageChange);
   }, []);
 
   // Auto-switch account mode if disabled by admin
@@ -2185,13 +2185,13 @@ export default function App() {
       if (mode === 'real') {
         if (prev.mode === 'demo') {
           setDemoAccountBalance(prev.balance);
-          localStorage.setItem('lwex_demo_balance', String(prev.balance));
+          localStorage.setItem('knex_demo_balance', String(prev.balance));
         }
         return { ...prev, mode: 'real', balance: realAccountBalance };
       } else {
         if (prev.mode === 'real') {
           setRealAccountBalance(prev.balance);
-          localStorage.setItem('lwex_real_balance', String(prev.balance));
+          localStorage.setItem('knex_real_balance', String(prev.balance));
         }
         return { ...prev, mode: 'demo', balance: demoAccountBalance };
       }
@@ -2207,7 +2207,7 @@ export default function App() {
   const handleResetDemoBalance = () => {
     if (account.mode !== 'demo') return;
     setDemoAccountBalance(10000.00);
-    localStorage.setItem('lwex_demo_balance', '10000');
+    localStorage.setItem('knex_demo_balance', '10000');
     setAccount((prev) => ({ ...prev, balance: 10000.00 }));
     triggerToast("Your demo trade bag has been replenished with virtual $10,000.00!", true);
   };
@@ -2236,7 +2236,7 @@ export default function App() {
           setCurrentUser((prevUser: any) => {
             if (!prevUser) return null;
             const updated = { ...prevUser, balance: data.balance };
-            localStorage.setItem('lwex_current_user', JSON.stringify(updated));
+            localStorage.setItem('knex_current_user', JSON.stringify(updated));
             return updated;
           });
         }
@@ -2837,7 +2837,7 @@ export default function App() {
                     balance: data.balance,
                     forceOutcome: data.forceOutcome !== undefined ? data.forceOutcome : prevUser.forceOutcome
                   };
-                  localStorage.setItem('lwex_current_user', JSON.stringify(updated));
+                  localStorage.setItem('knex_current_user', JSON.stringify(updated));
                   return updated;
                 });
               }
@@ -2883,16 +2883,16 @@ export default function App() {
 
   const handleUserUpdate = (user: any) => {
     // Only clear user-specific storage on user switch
-    ['lwex_account', 'lwex_current_user', 'lwex_trade_history'].forEach(key => localStorage.removeItem(key));
+    ['knex_account', 'knex_current_user', 'knex_trade_history'].forEach(key => localStorage.removeItem(key));
     
     if (user) {
-      localStorage.setItem('lwex_current_user', JSON.stringify(user));
+      localStorage.setItem('knex_current_user', JSON.stringify(user));
     }
     setCurrentUser(user);
 
     // Enforce admin constraints on auth change
-    const demoEnabled = JSON.parse(localStorage.getItem('lwex_admin_demo_enabled') ?? 'true');
-    const realEnabled = JSON.parse(localStorage.getItem('lwex_admin_real_enabled') ?? 'true');
+    const demoEnabled = JSON.parse(localStorage.getItem('knex_admin_demo_enabled') ?? 'true');
+    const realEnabled = JSON.parse(localStorage.getItem('knex_admin_real_enabled') ?? 'true');
 
     setAccount(prev => {
       let nextMode = prev.mode;
@@ -3069,7 +3069,7 @@ export default function App() {
           setCurrentUser((prevUser: any) => {
             if (!prevUser) return null;
             const updated = { ...prevUser, balance: data.balance };
-            localStorage.setItem('lwex_current_user', JSON.stringify(updated));
+            localStorage.setItem('knex_current_user', JSON.stringify(updated));
             return updated;
           });
         }
@@ -3134,7 +3134,7 @@ export default function App() {
           setCurrentUser((prevUser: any) => {
             if (!prevUser) return null;
             const updated = { ...prevUser, balance: data.balance };
-            localStorage.setItem('lwex_current_user', JSON.stringify(updated));
+            localStorage.setItem('knex_current_user', JSON.stringify(updated));
             return updated;
           });
         }
@@ -3204,6 +3204,7 @@ export default function App() {
 
   const handleSwitchView = (view: 'trade' | 'history' | 'stats' | 'finance' | 'p2p') => {
     setActiveTabView(view);
+    window.history.pushState({ tab: view }, '', window.location.href);
     if (view === 'p2p') {
       if (account.mode !== 'real') {
         handleSwitchAccount('real');
@@ -3214,6 +3215,18 @@ export default function App() {
     else if (view === 'stats') setPositionsTab('stats');
     else setPositionsTab('positions');
   };
+
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      if (event.state && event.state.tab) {
+        setActiveTabView(event.state.tab);
+      } else {
+        setActiveTabView('trade');
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   const handlePositionsTabChange = (tab: 'positions' | 'statements' | 'stats') => {
     setPositionsTab(tab);
@@ -3528,7 +3541,7 @@ export default function App() {
           setCurrentUser((prevUser: any) => {
             if (!prevUser) return null;
             const updated = { ...prevUser, balance: data.balance };
-            localStorage.setItem('lwex_current_user', JSON.stringify(updated));
+            localStorage.setItem('knex_current_user', JSON.stringify(updated));
             return updated;
           });
         }
@@ -3654,7 +3667,7 @@ export default function App() {
             </div>
             {!desktopSidebarCollapsed && (
               <div className="flex flex-col">
-                <span className="text-sm font-black tracking-wider text-white">LWEX</span>
+                <span className="text-sm font-black tracking-wider text-white">KNEX</span>
                 <span className="text-[10px] font-bold text-amber-500 tracking-widest -mt-1 uppercase">EXCHANGE</span>
               </div>
             )}
@@ -3861,11 +3874,11 @@ export default function App() {
                 ? 'bg-amber-500 text-slate-950 font-black shadow-md shadow-amber-500/10' 
                 : 'text-slate-450 hover:bg-slate-900/50 hover:text-white'
             }`}
-            title={desktopSidebarCollapsed ? "LWEX Copilot" : undefined}
+            title={desktopSidebarCollapsed ? "KNEX Copilot" : undefined}
           >
             <div className={`flex items-center ${desktopSidebarCollapsed ? '' : 'space-x-3'}`}>
               <Bot className="w-4 h-4 text-purple-400 shrink-0 animate-pulse" />
-              {!desktopSidebarCollapsed && <span>LWEX Copilot</span>}
+              {!desktopSidebarCollapsed && <span>KNEX Copilot</span>}
             </div>
             {!desktopSidebarCollapsed && (
               <span className="text-[8px] bg-emerald-500 text-slate-950 font-black px-1.5 py-0.5 rounded-full shrink-0">NEW</span>
@@ -3976,7 +3989,7 @@ export default function App() {
                 <div className="w-6 h-6 rounded-md bg-gradient-to-tr from-amber-500 to-yellow-400 text-slate-950 flex items-center justify-center font-black shrink-0">
                   <Sparkles className="w-3.5 h-3.5 text-slate-950" />
                 </div>
-                <span className="text-xs font-black tracking-wider text-slate-200">LWEX</span>
+                <span className="text-xs font-black tracking-wider text-slate-200">KNEX</span>
               </div>
             </div>
 
@@ -4571,7 +4584,7 @@ export default function App() {
                   {[
                     { id: 'R_25', label: '🌊 Tidal Flux', symbol: 'TFLUX' },
                     { id: 'R_50', label: '🛡️ Titan Swell', symbol: 'TITAN' },
-                    { id: 'R_10', label: '⚡ LWEX Flow', symbol: 'MFLOW' },
+                    { id: 'R_10', label: '⚡ KNEX Flow', symbol: 'MFLOW' },
                     { id: 'R_100', label: '👁️ Wizard Eye', symbol: 'WIZARD' },
                     { id: 'CRY_BTCUSD', label: '₿ Crypto Neptune', symbol: 'C-NEPT' },
                     { id: 'FRX_EURUSD', label: '🇪🇺 Meridian Link', symbol: 'M-LINK' }
@@ -6154,7 +6167,7 @@ export default function App() {
               <div>
                 <span className="inline-flex items-center space-x-1.5 bg-purple-500/25 border border-purple-500/30 text-purple-300 rounded px-1.5 py-0.5 text-[8px] font-black uppercase tracking-wider block w-max">
                   <Bot className="w-3 h-3 animate-spin text-purple-400" />
-                  <span>LWEX AI Copilot</span>
+                  <span>KNEX AI Copilot</span>
                 </span>
                 <h3 className="text-xs font-black text-white uppercase tracking-wide mt-2">SMART TRADING SIGNALS</h3>
                 <p className="text-[10px] text-slate-400 mt-1">Get real-time insights, algorithmic strategies, and consult your dedicated quant bot.</p>
@@ -6164,7 +6177,7 @@ export default function App() {
                 onClick={() => setIsCopilotOpen(true)}
                 className="bg-indigo-600 hover:bg-indigo-500 border border-indigo-500 hover:border-indigo-400 font-extrabold text-white text-[10px] uppercase py-2 tracking-wider rounded transition-all text-center select-none shadow-[0_4px_12px_rgba(79,70,229,0.3)] animate-pulse"
               >
-                Access LWEX Copilot
+                Access KNEX Copilot
               </button>
             </div>
 
@@ -6190,7 +6203,7 @@ export default function App() {
                   },
                   {
                     id: 3,
-                    title: "LWEX Certified as Secure Institutional High-Frequency Derivatives Outlet",
+                    title: "KNEX Certified as Secure Institutional High-Frequency Derivatives Outlet",
                     time: "1 hour ago",
                     opinion: "Corporate licensing has authorized secure fast-walk smart indexes on the main catalog. Stable connections and real-time ledger verify real security."
                   }
@@ -6241,13 +6254,13 @@ export default function App() {
 
               <div className="flex items-center space-x-2 text-[10px] text-amber-500 font-mono tracking-wider font-extrabold uppercase">
                 <Sparkles className="w-4 h-4 animate-spin" />
-                <span>LWEX Market Commentary</span>
+                <span>KNEX Market Commentary</span>
               </div>
 
               <h4 className="text-sm font-extrabold text-white leading-snug">{newsDetail.title}</h4>
 
               <div className="p-4 rounded-xl bg-slate-950 text-xs text-slate-300 leading-relaxed font-mono border border-slate-850 space-y-2">
-                <span className="font-black text-emerald-500 block uppercase text-[10px]">LWEX AI Analysis:</span>
+                <span className="font-black text-emerald-500 block uppercase text-[10px]">KNEX AI Analysis:</span>
                 <p>{newsDetail.opinion}</p>
                 <p className="text-[9px] text-slate-400">Disclaimer: Esoteric mathematical models exhibit drift variance. Ensure proper stake bounds on binary option contracts.</p>
               </div>
@@ -6256,7 +6269,7 @@ export default function App() {
                 onClick={() => { setNewsDetail(null); setIsCopilotOpen(true); }}
                 className="w-full bg-purple-600 hover:bg-purple-700 text-white font-extrabold text-xs uppercase py-2 rounded transition-colors text-center block"
               >
-                Ask LWEX Copilot
+                Ask KNEX Copilot
               </button>
             </div>
           </div>
@@ -6271,7 +6284,7 @@ export default function App() {
           theme === 'dark' ? 'border-slate-900 bg-slate-950 text-slate-500' : 'border-gray-200 bg-white text-gray-450'
         }`}>
           <div className="flex items-center space-x-4">
-            <span>© 2026 LWEX INC.</span>
+            <span>© 2026 KNEX INC.</span>
             <span className="hidden md:inline text-slate-650">•</span>
             <span className="hidden md:inline">Terms of Services</span>
             <span className="hidden md:inline">Privacy Protocol</span>
@@ -6291,7 +6304,7 @@ export default function App() {
           className={`fixed bottom-6 right-6 z-40 flex h-12 w-12 items-center justify-center rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-all cursor-pointer ${
             isDark ? 'bg-indigo-600 hover:bg-indigo-500 text-white' : 'bg-purple-600 text-white hover:bg-purple-700'
           }`}
-          title="Ask LWEX Copilot for market reports"
+          title="Ask KNEX Copilot for market reports"
         >
           <Bot className="h-6 h-6 animate-pulse" />
         </button>

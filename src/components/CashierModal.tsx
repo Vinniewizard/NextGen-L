@@ -72,7 +72,7 @@ export default function CashierModal({
     if (isOpen) {
       const userId = currentUser?.id || currentUser?.email || account.id;
       if (userId) {
-        const stored = localStorage.getItem(`knex_pending_deposit_${userId}`) || localStorage.getItem(`lwex_pending_deposit_${userId}`);
+        const stored = localStorage.getItem(`knex_pending_deposit_${userId}`) || localStorage.getItem(`knex_pending_deposit_${userId}`);
         if (stored) {
           try {
             const parsed = JSON.parse(stored);
@@ -165,7 +165,7 @@ export default function CashierModal({
         setReceiptFile(null);
         setMpesaMessage('');
         localStorage.removeItem(`knex_pending_deposit_${userId}`);
-        localStorage.removeItem(`lwex_pending_deposit_${userId}`);
+        localStorage.removeItem(`knex_pending_deposit_${userId}`);
         setSuccessMsg('Deposit order cancelled. You may now start a new deposit.');
       }
     } catch (e: any) {
@@ -272,7 +272,7 @@ export default function CashierModal({
           sandboxReason: (data.isSandbox && data.sandboxReason) ? data.sandboxReason : ''
         });
         localStorage.setItem(`knex_pending_deposit_${userId}`, payload);
-        localStorage.setItem(`lwex_pending_deposit_${userId}`, payload);
+        localStorage.setItem(`knex_pending_deposit_${userId}`, payload);
       }
 
       if (data.isSandbox && data.sandboxReason) {
@@ -315,7 +315,7 @@ export default function CashierModal({
           setSandboxReason('');
           if (userId) {
             localStorage.removeItem(`knex_pending_deposit_${userId}`);
-            localStorage.removeItem(`lwex_pending_deposit_${userId}`);
+            localStorage.removeItem(`knex_pending_deposit_${userId}`);
           }
         } else {
           if (data.status) {
@@ -500,7 +500,7 @@ export default function CashierModal({
           setDepositAddress(null);
           if (userId) {
             localStorage.removeItem(`knex_pending_deposit_${userId}`);
-            localStorage.removeItem(`lwex_pending_deposit_${userId}`);
+            localStorage.removeItem(`knex_pending_deposit_${userId}`);
           }
           return;
         }
@@ -520,7 +520,7 @@ export default function CashierModal({
         setSandboxReason('');
         if (userId) {
           localStorage.removeItem(`knex_pending_deposit_${userId}`);
-          localStorage.removeItem(`lwex_pending_deposit_${userId}`);
+          localStorage.removeItem(`knex_pending_deposit_${userId}`);
         }
       } else {
         if (!targetAddress.trim()) {
@@ -1275,7 +1275,7 @@ export default function CashierModal({
                               const userId = currentUser?.id || currentUser?.email || account.id;
                               if (userId) {
                                 localStorage.removeItem(`knex_pending_deposit_${userId}`);
-                                localStorage.removeItem(`lwex_pending_deposit_${userId}`);
+                                localStorage.removeItem(`knex_pending_deposit_${userId}`);
                               }
                             }}
                             className="w-full bg-slate-905 hover:bg-slate-800 text-slate-400 dark:text-slate-300 border border-slate-800/60 text-[10px] uppercase font-bold py-2 rounded-md transition-colors cursor-pointer"

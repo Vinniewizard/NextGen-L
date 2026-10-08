@@ -85,20 +85,20 @@ export default function Header({
   };
 
   const [isDark, setIsDark] = useState(theme === 'dark');
-  const [demoModeEnabled, setDemoModeEnabled] = useState(() => JSON.parse(localStorage.getItem('knex_admin_demo_enabled') ?? localStorage.getItem('lwex_admin_demo_enabled') ?? 'true'));
-  const [realModeEnabled, setRealModeEnabled] = useState(() => JSON.parse(localStorage.getItem('knex_admin_real_enabled') ?? localStorage.getItem('lwex_admin_real_enabled') ?? 'true'));
+  const [demoModeEnabled, setDemoModeEnabled] = useState(() => JSON.parse(localStorage.getItem('knex_admin_demo_enabled') ?? localStorage.getItem('knex_admin_demo_enabled') ?? 'true'));
+  const [realModeEnabled, setRealModeEnabled] = useState(() => JSON.parse(localStorage.getItem('knex_admin_real_enabled') ?? localStorage.getItem('knex_admin_real_enabled') ?? 'true'));
 
   useEffect(() => {
     const handleStorageChange = () => {
-      setDemoModeEnabled(JSON.parse(localStorage.getItem('knex_admin_demo_enabled') ?? localStorage.getItem('lwex_admin_demo_enabled') ?? 'true'));
-      setRealModeEnabled(JSON.parse(localStorage.getItem('knex_admin_real_enabled') ?? localStorage.getItem('lwex_admin_real_enabled') ?? 'true'));
+      setDemoModeEnabled(JSON.parse(localStorage.getItem('knex_admin_demo_enabled') ?? localStorage.getItem('knex_admin_demo_enabled') ?? 'true'));
+      setRealModeEnabled(JSON.parse(localStorage.getItem('knex_admin_real_enabled') ?? localStorage.getItem('knex_admin_real_enabled') ?? 'true'));
     };
 
     window.addEventListener('knex-settings-changed', handleStorageChange);
-    window.addEventListener('lwex-settings-changed', handleStorageChange);
+    window.addEventListener('knex-settings-changed', handleStorageChange);
     return () => {
       window.removeEventListener('knex-settings-changed', handleStorageChange);
-      window.removeEventListener('lwex-settings-changed', handleStorageChange);
+      window.removeEventListener('knex-settings-changed', handleStorageChange);
     };
   }, []);
 
@@ -343,7 +343,7 @@ export default function Header({
             </button>
 
             {/* Admin Guard Console */}
-            {(currentUser?.email === 'admin@knex.com' || currentUser?.email === 'admin@lwex.com' || currentUser?.email === 'admin@derive.com') && onOpenAdmin && (
+            {(currentUser?.email === 'admin@knex.com' || currentUser?.email === 'admin@knex.com' || currentUser?.email === 'admin@derive.com') && onOpenAdmin && (
               <button
                 onClick={onOpenAdmin}
                 className="rounded-lg p-1.5 md:p-2 border border-rose-500/20 bg-rose-500/10 text-rose-400 hover:bg-rose-500/25 animate-pulse cursor-pointer flex-shrink-0"

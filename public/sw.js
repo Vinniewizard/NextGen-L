@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lwex-app-v2';
+const CACHE_NAME = 'knex-app-v2';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',

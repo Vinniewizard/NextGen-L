@@ -451,7 +451,7 @@ export default function BannerDesigner({ config, onChange }: BannerDesignerProps
     if (!canvas) return;
     const url = canvas.toDataURL("image/png");
     const link = document.createElement("a");
-    link.download = `${(config.platformName || "lwex").toLowerCase()}_marketing_banner.png`;
+    link.download = `${(config.platformName || "knex").toLowerCase()}_marketing_banner.png`;
     link.href = url;
     link.click();
     

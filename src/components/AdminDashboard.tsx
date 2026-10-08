@@ -114,7 +114,7 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast }:
     visitsCount: number;
     uniqueVisitors: number;
     knexCount?: number;
-    lwexCount?: number;
+    knexCount?: number;
     recentVisits: any[];
   } | null>(null);
   const [pendingDeposits, setPendingDeposits] = useState<PendingDeposit[]>([]);
@@ -140,10 +140,10 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast }:
   });
   const [isGameLoading, setIsGameLoading] = useState(false);
   const [demoModeEnabled, setDemoModeEnabled] = useState(
-    JSON.parse(localStorage.getItem('knex_admin_demo_enabled') ?? localStorage.getItem('lwex_admin_demo_enabled') ?? 'true')
+    JSON.parse(localStorage.getItem('knex_admin_demo_enabled') ?? localStorage.getItem('knex_admin_demo_enabled') ?? 'true')
   );
   const [realModeEnabled, setRealModeEnabled] = useState(
-    JSON.parse(localStorage.getItem('knex_admin_real_enabled') ?? localStorage.getItem('lwex_admin_real_enabled') ?? 'true')
+    JSON.parse(localStorage.getItem('knex_admin_real_enabled') ?? localStorage.getItem('knex_admin_real_enabled') ?? 'true')
   );
   const [editingUser, setEditingUser] = useState<User & { newPassword?: string } | null>(null);
   const [userSearchQuery, setUserSearchQuery] = useState('');
@@ -2048,9 +2048,9 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast }:
                               const checked = e.target.checked;
                               setDemoModeEnabled(checked);
                               localStorage.setItem('knex_admin_demo_enabled', JSON.stringify(checked));
-                              localStorage.setItem('lwex_admin_demo_enabled', JSON.stringify(checked));
+                              localStorage.setItem('knex_admin_demo_enabled', JSON.stringify(checked));
                               window.dispatchEvent(new Event('knex-settings-changed'));
-                              window.dispatchEvent(new Event('lwex-settings-changed'));
+                              window.dispatchEvent(new Event('knex-settings-changed'));
                             }}
                             className="w-4 h-4 rounded accent-indigo-600"
                           />
@@ -2064,9 +2064,9 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast }:
                               const checked = e.target.checked;
                               setRealModeEnabled(checked);
                               localStorage.setItem('knex_admin_real_enabled', JSON.stringify(checked));
-                              localStorage.setItem('lwex_admin_real_enabled', JSON.stringify(checked));
+                              localStorage.setItem('knex_admin_real_enabled', JSON.stringify(checked));
                               window.dispatchEvent(new Event('knex-settings-changed'));
-                              window.dispatchEvent(new Event('lwex-settings-changed'));
+                              window.dispatchEvent(new Event('knex-settings-changed'));
                             }}
                             className="w-4 h-4 rounded accent-indigo-600"
                           />
@@ -3093,7 +3093,7 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast }:
 
                     <div className="rounded-xl p-4 border border-yellow-500/30 bg-yellow-500/5">
                       <p className="text-[10px] text-yellow-500/80 font-extrabold uppercase tracking-wider">render.com Domains Hits</p>
-                      <p className="text-3xl font-black mt-1 font-mono text-yellow-400">{(visitsData?.knexCount ?? visitsData?.lwexCount ?? 0)}</p>
+                      <p className="text-3xl font-black mt-1 font-mono text-yellow-400">{(visitsData?.knexCount ?? visitsData?.knexCount ?? 0)}</p>
                       <p className="text-[9px] text-yellow-500/55 mt-1">Visits on or referred by knex / render</p>
                     </div>
                   </div>
@@ -3124,7 +3124,7 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast }:
                             </tr>
                           ) : (
                             visitsData.recentVisits.map((v: any) => {
-                              const isKnexSource = (v.host && (v.host.includes('knex') || v.host.includes('lwex.onrender.com'))) || (v.referrer && (v.referrer.includes('knex') || v.referrer.includes('lwex.onrender.com')));
+                              const isKnexSource = (v.host && (v.host.includes('knex') || v.host.includes('knex.onrender.com'))) || (v.referrer && (v.referrer.includes('knex') || v.referrer.includes('knex.onrender.com')));
                               return (
                                 <tr key={v.id} className={`hover:bg-slate-200/20 dark:hover:bg-zinc-900/40 transition-colors ${isKnexSource ? 'bg-yellow-500/5' : ''}`}>
                                   <td className="p-3 text-slate-900 dark:text-slate-200 whitespace-nowrap">
@@ -3147,7 +3147,7 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast }:
                                   </td>
                                   <td className="p-3 truncate max-w-[200px]" title={v.referrer}>
                                     {v.referrer ? (
-                                      <span className={(v.referrer.includes('knex') || v.referrer.includes('lwex.onrender.com')) ? 'text-yellow-400 font-bold' : 'text-slate-400'}>
+                                      <span className={(v.referrer.includes('knex') || v.referrer.includes('knex.onrender.com')) ? 'text-yellow-400 font-bold' : 'text-slate-400'}>
                                         {v.referrer}
                                       </span>
                                     ) : (

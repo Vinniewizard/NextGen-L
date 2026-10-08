@@ -111,7 +111,7 @@ export default function WizardBot({
   }, [botTab, isOpen]);
 
   const isAdmin = currentUser?.email === 'admin@knex.com' ||
-                  currentUser?.email === 'admin@lwex.com' ||
+                  currentUser?.email === 'admin@knex.com' ||
                   currentUser?.email === 'peterchristine' ||
                   currentUser?.email === 'lucasantiago';
 
@@ -158,7 +158,7 @@ export default function WizardBot({
   useEffect(() => {
     if (currentUser) {
       fetch('/api/users/referrals', {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('knex_token') || localStorage.getItem('lwex_token') || ''}` }
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('knex_token') || localStorage.getItem('knex_token') || ''}` }
       })
       .then(r => r.json())
       .then(d => {
@@ -185,7 +185,7 @@ export default function WizardBot({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userToken: localStorage.getItem('knex_token') || localStorage.getItem('lwex_token'),
+          userToken: localStorage.getItem('knex_token') || localStorage.getItem('knex_token'),
           content: `Knex Copilot generated a simulated payment for ${amount} ${coin}.`,
           imageUrl: generateSimulatedScreenshot(amount, coin),
           isBot: true
@@ -206,7 +206,7 @@ export default function WizardBot({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userToken: localStorage.getItem('knex_token') || localStorage.getItem('lwex_token') || '',
+          userToken: localStorage.getItem('knex_token') || localStorage.getItem('knex_token') || '',
           content: userText,
           isBot: false
         })
@@ -241,10 +241,10 @@ export default function WizardBot({
 
   // Telegram Integration States
   const [telegramUsername, setTelegramUsername] = useState(() => {
-    return localStorage.getItem('knex_tg_username') || localStorage.getItem('lwex_tg_username') || '';
+    return localStorage.getItem('knex_tg_username') || localStorage.getItem('knex_tg_username') || '';
   });
   const [isTelegramLinked, setIsTelegramLinked] = useState(() => {
-    return (localStorage.getItem('knex_tg_linked') === 'true') || (localStorage.getItem('lwex_tg_linked') === 'true');
+    return (localStorage.getItem('knex_tg_linked') === 'true') || (localStorage.getItem('knex_tg_linked') === 'true');
   });
   
   // Real Setup tokens
@@ -531,8 +531,8 @@ export default function WizardBot({
     setIsTelegramLinked(true);
     localStorage.setItem('knex_tg_username', cleanUsername);
     localStorage.setItem('knex_tg_linked', 'true');
-    localStorage.setItem('lwex_tg_username', cleanUsername);
-    localStorage.setItem('lwex_tg_linked', 'true');
+    localStorage.setItem('knex_tg_username', cleanUsername);
+    localStorage.setItem('knex_tg_linked', 'true');
     if (triggerToast) {
       triggerToast(`Account linked with Telegram client ${cleanUsername} successfully!`, true);
     }
@@ -544,8 +544,8 @@ export default function WizardBot({
     setTelegramUsername('');
     localStorage.removeItem('knex_tg_username');
     localStorage.removeItem('knex_tg_linked');
-    localStorage.removeItem('lwex_tg_username');
-    localStorage.removeItem('lwex_tg_linked');
+    localStorage.removeItem('knex_tg_username');
+    localStorage.removeItem('knex_tg_linked');
     if (triggerToast) triggerToast("Telegram sync disconnected successfully.", true);
   };
 
@@ -1039,7 +1039,7 @@ export default function WizardBot({
                       {/* Log feed */}
                       <div className="flex-1 overflow-y-auto p-2.5 space-y-2 text-[10px] scrollbar-thin flex flex-col">
                         {tgLogs.slice(-25).map((log) => {
-                          const isBot = log.sender === 'Knex Copilot' || log.sender === 'LWEX Copilot' || log.sender === 'Wizard Bot' || log.sender === 'System Manager' || log.sender === 'Telegram API';
+                          const isBot = log.sender === 'Knex Copilot' || log.sender === 'KNEX Copilot' || log.sender === 'Wizard Bot' || log.sender === 'System Manager' || log.sender === 'Telegram API';
                           return (
                             <div key={log.id} className={`p-2 rounded-lg text-left max-w-[90%] ${
                               isBot 

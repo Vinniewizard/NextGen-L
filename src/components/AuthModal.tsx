@@ -51,8 +51,8 @@ export default function AuthModal({ isOpen, onClose, theme, onSuccess, initialVi
         if (user && token) {
           localStorage.setItem('knex_current_user', JSON.stringify(user));
           localStorage.setItem('knex_token', token);
-          localStorage.setItem('lwex_current_user', JSON.stringify(user));
-          localStorage.setItem('lwex_token', token);
+          localStorage.setItem('knex_current_user', JSON.stringify(user));
+          localStorage.setItem('knex_token', token);
           onSuccess(user);
           onClose();
         }
@@ -129,10 +129,10 @@ export default function AuthModal({ isOpen, onClose, theme, onSuccess, initialVi
   };
 
   const getDeviceDetails = () => {
-    let deviceId = localStorage.getItem('lwex_device_id');
+    let deviceId = localStorage.getItem('knex_device_id');
     if (!deviceId) {
       deviceId = 'dev-' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-      localStorage.setItem('lwex_device_id', deviceId);
+      localStorage.setItem('knex_device_id', deviceId);
     }
     const deviceInfo = `${navigator.platform || 'Unknown OS'} | ${navigator.userAgent} | Screen: ${window.screen.width}x${window.screen.height}`;
     return { deviceId, deviceInfo };

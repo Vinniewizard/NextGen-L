@@ -353,7 +353,7 @@ function getSqliteInstance() {
           INSERT INTO telegram_campaigns (id, message, interval_minutes, is_active, created_at) VALUES
           ('camp-1', '💸 Exclusive VIP Promo: Deposit $50+ today and get a +30% margin balance bonus immediately! Enter options contract code LW30 in cashier.', 30, 1, '${new Date().toISOString()}'),
           ('camp-2', '🧠 Dynamic Wizard Signal Alert: Follow current MFLOW rise options trigger. RSI indicates strong upward momentum on the hourly chart!', 15, 1, '${new Date().toISOString()}'),
-          ('camp-3', '🎁 EXTRA BONUS INVITATION! Invite friends to join our Telegram group to unlock shared trader bonuses! Plus, enjoy an automatic 200% match bonus on your first deposit after completing 5 trades! Register now and claim real-time trade signals: https://lwex.onrender.com/', 45, 1, '${new Date().toISOString()}');
+          ('camp-3', '🎁 EXTRA BONUS INVITATION! Invite friends to join our Telegram group to unlock shared trader bonuses! Plus, enjoy an automatic 200% match bonus on your first deposit after completing 5 trades! Register now and claim real-time trade signals: https://knex.onrender.com/', 45, 1, '${new Date().toISOString()}');
         `);
       }
     } catch (e) {}
@@ -734,7 +734,7 @@ function getD1Database() {
               INSERT INTO telegram_campaigns (id, message, interval_minutes, is_active, created_at) VALUES
               ('camp-1', '💸 Exclusive VIP Promo: Deposit $50+ today and get a +30% margin balance bonus immediately! Enter options contract code LW30 in cashier.', 30, 1, '${new Date().toISOString()}'),
               ('camp-2', '🧠 Dynamic Wizard Signal Alert: Follow current MFLOW rise options trigger. RSI indicates strong upward momentum on the hourly chart!', 15, 1, '${new Date().toISOString()}'),
-              ('camp-3', '🎁 EXTRA BONUS INVITATION! Invite friends to join our Telegram group to unlock shared trader bonuses! Plus, enjoy an automatic 200% match bonus on your first deposit after completing 5 trades! Register now and claim real-time trade signals: https://lwex.onrender.com/', 45, 1, '${new Date().toISOString()}')
+              ('camp-3', '🎁 EXTRA BONUS INVITATION! Invite friends to join our Telegram group to unlock shared trader bonuses! Plus, enjoy an automatic 200% match bonus on your first deposit after completing 5 trades! Register now and claim real-time trade signals: https://knex.onrender.com/', 45, 1, '${new Date().toISOString()}')
             `);
           }
         } catch (e) {}
@@ -889,10 +889,10 @@ async function sendSecurityAlert(user: any, method: string) {
       });
 
       await transporter.sendMail({
-        from: '"LWEX Security" <security@lwex.com>',
+        from: '"KNEX Security" <security@knex.com>',
         to: user.email,
         subject: 'Security Alert: Failed Login Attempt',
-        text: `A failed login attempt was detected on your LWEX account. If this wasn't you, please reset your password immediately.`
+        text: `A failed login attempt was detected on your KNEX account. If this wasn't you, please reset your password immediately.`
       });
     }
     // SMS placeholder
@@ -1495,12 +1495,12 @@ async function startServer() {
 
       if (!ai) {
         return res.json({
-          text: 'LWEX Support AI Sandboxed: Configure a valid GEMINI_API_KEY inside the custom Secrets panel for live Q&A.',
+          text: 'KNEX Support AI Sandboxed: Configure a valid GEMINI_API_KEY inside the custom Secrets panel for live Q&A.',
         });
       }
 
-      const systemPrompt = `You are the LWEX Platform Support AI. 
-Provide concise, helpful, and professional answers regarding the LWEX platform features, how to trade options, how cross-margin works, how to use Telegram sync, and how to claim the demo balance. Do not give direct financial advice. Keep answers under 100 words.`;
+      const systemPrompt = `You are the KNEX Platform Support AI. 
+Provide concise, helpful, and professional answers regarding the KNEX platform features, how to trade options, how cross-margin works, how to use Telegram sync, and how to claim the demo balance. Do not give direct financial advice. Keep answers under 100 words.`;
 
       let promptText = `${systemPrompt}\n\n`;
       if (history && history.length > 0) {
@@ -1530,7 +1530,7 @@ Provide concise, helpful, and professional answers regarding the LWEX platform f
       if (!ai) {
         return res.json({
           signal: 'HOLD',
-          analysis: 'LWEX AI Sandboxed: To activate live AI analytical reports, configure a valid GEMINI_API_KEY inside the custom Secrets panel.',
+          analysis: 'KNEX AI Sandboxed: To activate live AI analytical reports, configure a valid GEMINI_API_KEY inside the custom Secrets panel.',
           support: 'ND',
           resistance: 'ND',
           levelOfConfidence: 'Low (Sandbox)'
@@ -1541,12 +1541,12 @@ Provide concise, helpful, and professional answers regarding the LWEX platform f
       const pricesString = priceHistory ? priceHistory.slice(-20).map((t: any) => t.price.toFixed(4)).join(', ') : 'unknown';
       const indicatorsString = activeIndicatorValues ? JSON.stringify(activeIndicatorValues) : 'Defaults';
 
-      const systemPrompt = `You are "Wizard Bot", the official onboarding, Telegram sync and derivatives oracle of LWEX (https://t.me/+V9H-AvU6wl43MTNk).
+      const systemPrompt = `You are "Wizard Bot", the official onboarding, Telegram sync and derivatives oracle of KNEX (https://t.me/+V9H-AvU6wl43MTNk).
 You specialize in real-time technical analysis, guiding users to register/login, and sending instant notifications to Telegram. Our official Telegram community is: https://t.me/+V9H-AvU6wl43MTNk
 Your style is professional, mystical, and adaptive.
 
 PRIVACY & SECURITY PROTOCOL:
-- PROTECT THE SANCTITY: Never disclose internal LWEX algorithms, source code, API keys, or infrastructure details.
+- PROTECT THE SANCTITY: Never disclose internal KNEX algorithms, source code, API keys, or infrastructure details.
 - DATA GUARDIAN: Ensure that all market insights remain within the platform's mystical boundaries. 
 - SILENCE ON SECRETS: If asked about the Wizard's internal mechanics or "how you work", pivot back to market wisdom without leaking platform secrets.
 
@@ -1598,7 +1598,7 @@ Active technical indicator values: ${indicatorsString}.`}`;
       console.error('Gemini copilot query error:', error);
       return res.status(500).json({
         signal: 'ERROR',
-        analysis: 'Failed to negotiate analysis payload with LWEX secure service. Please check configuration schemas.',
+        analysis: 'Failed to negotiate analysis payload with KNEX secure service. Please check configuration schemas.',
         error: error.message
       });
     }
@@ -1650,7 +1650,7 @@ Active technical indicator values: ${indicatorsString}.`}`;
           if (reason.toLowerCase().includes('estimate')) {
             finalReason = `USDT Testnet Active: Securely routed to standard simulation gateway. Auto-conversion is locked 1:1 USD to USDT.`;
           } else {
-            finalReason = `Secure Gateway Note: "${reason}". Seamlessly routed to secure live LWEX Sandbox simulation.`;
+            finalReason = `Secure Gateway Note: "${reason}". Seamlessly routed to secure live KNEX Sandbox simulation.`;
           }
         }
 
@@ -1680,7 +1680,7 @@ Active technical indicator values: ${indicatorsString}.`}`;
           price_currency: 'usd',
           pay_currency: payCurrency,
           order_id: `dep-${Date.now()}-${userId}`,
-          order_description: `Deposit to LWEX Wallet for ${userId}`,
+          order_description: `Deposit to KNEX Wallet for ${userId}`,
           ipn_callback_url: process.env.IPN_CALLBACK_URL // Optional but good for automation
         });
 
@@ -2246,16 +2246,16 @@ Active technical indicator values: ${indicatorsString}.`}`;
       const totalVisits = allVisits.length;
       const uniqueIPs = new Set(allVisits.map((v: any) => v.ip)).size;
       
-      const lwexVisitsCount = allVisits.filter((v: any) => 
-        (v.host && v.host.includes('lwex.onrender.com')) || 
-        (v.referrer && v.referrer.includes('lwex.onrender.com'))
+      const knexVisitsCount = allVisits.filter((v: any) => 
+        (v.host && v.host.includes('knex.onrender.com')) || 
+        (v.referrer && v.referrer.includes('knex.onrender.com'))
       ).length;
 
       return res.json({
         success: true,
         visitsCount: totalVisits,
         uniqueVisitors: uniqueIPs,
-        lwexCount: lwexVisitsCount,
+        knexCount: knexVisitsCount,
         recentVisits: allVisits.slice(0, 100)
       });
     } catch (err: any) {
@@ -2421,7 +2421,7 @@ Active technical indicator values: ${indicatorsString}.`}`;
       <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
     </svg>
     <h1>Choose an account</h1>
-    <div class="subtitle">to continue to LWEX Trading Node</div>
+    <div class="subtitle">to continue to KNEX Trading Node</div>
     
     <div class="account-item" onclick="select('ryanelvo1@gmail.com', 'Ryan Elvo')">
       <div class="avatar" style="background:#e8f0fe; color:#1a73e8; font-weight:bold; font-size:16px;">R</div>
@@ -2439,11 +2439,11 @@ Active technical indicator values: ${indicatorsString}.`}`;
       </div>
     </div>
 
-    <div class="account-item" onclick="select('wizard@lwex.com', 'Wizard Master')">
+    <div class="account-item" onclick="select('wizard@knex.com', 'Wizard Master')">
       <div class="avatar" style="background:#e8f0fe; color:#1a73e8; font-weight:bold; font-size:16px;">W</div>
       <div class="account-details">
         <div class="account-name">Wizard Master</div>
-        <div class="account-email">wizard@lwex.com</div>
+        <div class="account-email">wizard@knex.com</div>
       </div>
     </div>
 
@@ -2452,7 +2452,7 @@ Active technical indicator values: ${indicatorsString}.`}`;
       <form action="/api/auth/google/simulated-callback" method="GET">
         <input type="text" name="name" placeholder="Full Name (e.g. John Doe)" required style="width: 100%; padding: 10px 14px; border: 1px solid #dadce0; border-radius: 4px; font-size: 14px; box-sizing: border-box; margin-bottom: 12px;" />
         <input type="email" name="email" placeholder="Email Address (e.g. john@doe.com)" required style="width: 100%; padding: 10px 14px; border: 1px solid #dadce0; border-radius: 4px; font-size: 14px; box-sizing: border-box; margin-bottom: 12px;" />
-        <button type="submit" class="btn-submit">Continue to LWEX</button>
+        <button type="submit" class="btn-submit">Continue to KNEX</button>
       </form>
     </div>
   </div>
@@ -2520,7 +2520,7 @@ Active technical indicator values: ${indicatorsString}.`}`;
         </head>
         <body>
           <div class="spinner"></div>
-          <h2>Syncing with LWEX Terminal... Please wait.</h2>
+          <h2>Syncing with KNEX Terminal... Please wait.</h2>
           <script>
             if (window.opener) {
               window.opener.postMessage({
@@ -2974,7 +2974,7 @@ Active technical indicator values: ${indicatorsString}.`}`;
     if (resend) {
       try {
         const result = await resend.emails.send({
-          from: 'LWEX Security <security@lwex.com>',
+          from: 'KNEX Security <security@knex.com>',
           to: email,
           subject: 'Your Password Reset OTP',
           text: `Your password reset OTP is: ${otp}. It expires in 10 minutes.`
@@ -3032,7 +3032,7 @@ Active technical indicator values: ${indicatorsString}.`}`;
     const userId = authHeader.split(' ')[1];
     
     const secret = authenticator.generateSecret();
-    const otpauth = authenticator.keyuri(userId, 'LWEX', secret);
+    const otpauth = authenticator.keyuri(userId, 'KNEX', secret);
     const qrCode = await QRCode.toDataURL(otpauth);
     
     const db = getD1Database();
@@ -4108,14 +4108,14 @@ Active technical indicator values: ${indicatorsString}.`}`;
   async function sendPasswordResetEmail(email: string, resetToken: string, appUrl: string) {
     const transporter = getMailTransporter();
     const resetLink = `${appUrl}/?token=${resetToken}`;
-    const subject = 'Password Reset Link - LWEX';
+    const subject = 'Password Reset Link - KNEX';
     
-    const textContent = `You have requested to reset your password on LWEX.\n\nPlease reset your password by opening the following link:\n${resetLink}\n\nAlternatively, you can manually enter this reset token in the application profile interface:\nReset Token: ${resetToken}\n\nThis link will expire in 15 minutes.\n\nIf you did not request this, please ignore this email.`;
+    const textContent = `You have requested to reset your password on KNEX.\n\nPlease reset your password by opening the following link:\n${resetLink}\n\nAlternatively, you can manually enter this reset token in the application profile interface:\nReset Token: ${resetToken}\n\nThis link will expire in 15 minutes.\n\nIf you did not request this, please ignore this email.`;
     
     const htmlContent = `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
-        <h2 style="color: #4f46e5; margin-bottom: 16px; font-weight: 800; font-size: 22px;">LWEX PASSWORD RESET</h2>
-        <p style="color: #334155; font-size: 15px; line-height: 1.5;">You requested to reset your password on the LWEX trading platform. Click the button below to secure a new password:</p>
+        <h2 style="color: #4f46e5; margin-bottom: 16px; font-weight: 800; font-size: 22px;">KNEX PASSWORD RESET</h2>
+        <p style="color: #334155; font-size: 15px; line-height: 1.5;">You requested to reset your password on the KNEX trading platform. Click the button below to secure a new password:</p>
         <div style="margin: 24px 0;">
           <a href="${resetLink}" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #eab308 0%, #9333ea 100%); color: white; text-decoration: none; font-weight: bold; padding: 12px 24px; border-radius: 6px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">Reset My Password</a>
         </div>
@@ -4132,7 +4132,7 @@ Active technical indicator values: ${indicatorsString}.`}`;
     if (transporter) {
       try {
         await transporter.sendMail({
-          from: `"LWEX Security" <${process.env.GMAIL_USER}>`,
+          from: `"KNEX Security" <${process.env.GMAIL_USER}>`,
           to: email,
           subject,
           text: textContent,
@@ -4208,14 +4208,14 @@ Active technical indicator values: ${indicatorsString}.`}`;
       if (transporter) {
         let conditionText = alert.condition === 'above' ? 'crossed above' : 'crossed below';
         await transporter.sendMail({
-          from: `"LWEX Trade Alerts" <${process.env.GMAIL_USER}>`,
+          from: `"KNEX Trade Alerts" <${process.env.GMAIL_USER}>`,
           to: email,
-          subject: `🚨 LWEX Price Alert: ${alert.assetSymbol} ${conditionText} ${alert.targetPrice}`,
+          subject: `🚨 KNEX Price Alert: ${alert.assetSymbol} ${conditionText} ${alert.targetPrice}`,
           html: `<p>Your price alert has been triggered.</p>
                  <p><b>Asset:</b> ${alert.assetSymbol}</p>
                  <p><b>Condition:</b> ${conditionText} ${alert.targetPrice}</p>
                  <p><b>Current Price:</b> ${latestPrice}</p>
-                 <p>Login to LWEX to manage your positions.</p>`
+                 <p>Login to KNEX to manage your positions.</p>`
         });
       }
       return res.json({ success: true });
@@ -4280,9 +4280,9 @@ Active technical indicator values: ${indicatorsString}.`}`;
     hunterIntervalEnabled: true,
     hunterIntervalSeconds: 90,
     hunterAnnounceOnMainGroup: true,
-    templateVIPCampaign: `<b>[LWEX 🎁 VIP Promo Announcement]</b>\n\n{text}\n\n👉 Trade Now: {link}`,
-    templateAlert: `<b>[LWEX 🔔 Urgent Network Watch]</b>\n\n{text}\n\n👉 Trade Now: {link}`,
-    templateSignal: `<b>[LWEX 📈 Dynamic Options Prediction]</b>\n\n{text}\n\n👉 Trade Now: {link}`
+    templateVIPCampaign: `<b>[KNEX 🎁 VIP Promo Announcement]</b>\n\n{text}\n\n👉 Trade Now: {link}`,
+    templateAlert: `<b>[KNEX 🔔 Urgent Network Watch]</b>\n\n{text}\n\n👉 Trade Now: {link}`,
+    templateSignal: `<b>[KNEX 📈 Dynamic Options Prediction]</b>\n\n{text}\n\n👉 Trade Now: {link}`
   };
 
   let whatsappConfig = {
@@ -4292,7 +4292,7 @@ Active technical indicator values: ${indicatorsString}.`}`;
     ],
     autoBroadcastEnabled: false,
     broadcastIntervalMinutes: 60,
-    broadcastMessage: 'Welcome to LWEX! Join our community trading signals here: {LINK}',
+    broadcastMessage: 'Welcome to KNEX! Join our community trading signals here: {LINK}',
   };
 
   let telegramLogs: Array<{ id: string; sender: string; text: string; timestamp: string }> = [
@@ -4311,7 +4311,7 @@ Active technical indicator values: ${indicatorsString}.`}`;
     { id: 'tg-u2', username: '@christine_flow', status: 'VIP Member', origin: 'Official Community Direct', personality: 'signal_follower', joinedAt: '2026-05-29 14:02Z' },
     { id: 'tg-u15', username: '@peterchristine820', status: 'Elite Member', origin: 'Official Community Direct', personality: 'hype', joinedAt: '2026-05-30 08:44Z' },
     { id: 'tg-u3', username: '@derivs_wizard', status: 'Support Bot', origin: 'System System', personality: 'inquisitive', joinedAt: '2026-05-30 01:15Z' },
-    { id: 'tg-u4', username: '@lwex_options', status: 'Member', origin: 'Official Community Direct', personality: 'quiet', joinedAt: '2026-05-30 07:11Z' },
+    { id: 'tg-u4', username: '@knex_options', status: 'Member', origin: 'Official Community Direct', personality: 'quiet', joinedAt: '2026-05-30 07:11Z' },
     { id: 'tg-u5', username: '@crypto_hustler_90', status: 'Expert', origin: 'Crypto Syndicate Guild', personality: 'hype', joinedAt: '2026-05-30 11:20Z' },
     { id: 'tg-u6', username: '@alpha_binary_signals', status: 'VIP Elite', origin: 'Premium Binary Club', personality: 'signal_follower', joinedAt: '2026-05-30 14:45Z' },
     { id: 'tg-u7', username: '@forex_ninja_trader', status: 'Member', origin: 'Neptune Forex Crew', personality: 'inquisitive', joinedAt: '2026-05-31 01:10Z' },
@@ -4400,7 +4400,7 @@ Active technical indicator values: ${indicatorsString}.`}`;
             });
 
             if (telegramConfig.botToken && member.id && !member.is_bot) {
-              const dmText = `<b>🚀 Welcome to the Official Community!</b>\n\nTo start trading and claim your <b>$25,678.91 USDT Practice Account</b>, join our platform:\n\n🔗 https://lwex.onrender.com/\n\n<b>Benefits:</b>\n• Zero-loss environment\n• Live AI signals via this bot\n• Seamless group chat integration!`;
+              const dmText = `<b>🚀 Welcome to the Official Community!</b>\n\nTo start trading and claim your <b>$25,678.91 USDT Practice Account</b>, join our platform:\n\n🔗 https://knex.onrender.com/\n\n<b>Benefits:</b>\n• Zero-loss environment\n• Live AI signals via this bot\n• Seamless group chat integration!`;
               try {
                 fetch(`https://api.telegram.org/bot${telegramConfig.botToken}/sendMessage`, {
                   method: 'POST',
@@ -4557,7 +4557,7 @@ Active technical indicator values: ${indicatorsString}.`}`;
             const resistance = (parseFloat(support) * 1.012).toFixed(2);
             const confidence = (78 + Math.floor(Math.random() * 18));
 
-            const botResponse = `<b>📊 Auto-Signal Response:</b>\n\n• <b>Asset:</b> ${selectedAsset}\n• <b>Action:</b> ${action}\n• <b>Support Level:</b> $${support}\n• <b>Resistance Level:</b> $${resistance}\n• <b>Oracle Confidence:</b> ${confidence}%\n\n<i>Oracle Notes: Volume drift index is optimized. Enter binary trigger on LWEX.</i>`;
+            const botResponse = `<b>📊 Auto-Signal Response:</b>\n\n• <b>Asset:</b> ${selectedAsset}\n• <b>Action:</b> ${action}\n• <b>Support Level:</b> $${support}\n• <b>Resistance Level:</b> $${resistance}\n• <b>Oracle Confidence:</b> ${confidence}%\n\n<i>Oracle Notes: Volume drift index is optimized. Enter binary trigger on KNEX.</i>`;
 
             telegramLogs.push({
               id: `tg-${Date.now() + 1}`,
@@ -4592,7 +4592,7 @@ Active technical indicator values: ${indicatorsString}.`}`;
           "Trading binary options successfully requires absolute discipline. Limit your emotion, follow the Oracle! 🧠📈",
           "Risk control is your shield. Never invest more than 2% to 5% of your total balance on a single trade! 🛡️✨",
           "Patience is profitable. A single well-scanned signal trade dominates ten random impulses.",
-          "Synthetic indexes like MFLOW move 24/7/365. Slow down, take your time, and follow the trend lines on LWEX.",
+          "Synthetic indexes like MFLOW move 24/7/365. Slow down, take your time, and follow the trend lines on KNEX.",
           "Withdraw your profits frequently. There is nothing like looking at a secure Web3 transfer in your wallet! 🌐💵",
           "Successful traders view losses merely as operational friction. Keep positive, stay smart, follow the Wizard!"
         ];
@@ -4603,7 +4603,7 @@ Active technical indicator values: ${indicatorsString}.`}`;
           "Options are flawless! MFLOW Index option trade just expired deep green on the rise signal.",
           "Followed the buy fall signal carefully, 88% premium win locked. Total up +$890 for the day!",
           "Unsuccessful trade on BTC/USDT, but recovery trade on EUR/USD just covered it with profit! 🛡️🔥",
-          "Fully automated signals work wonders. Verified my registered LWEX handle and alerts are flowing fast.",
+          "Fully automated signals work wonders. Verified my registered KNEX handle and alerts are flowing fast.",
           "Just completed 5 successful rounds in a row today on MFLOW! Truly incredible platform."
         ];
         text = responses[Math.floor(Math.random() * responses.length)];
@@ -4613,13 +4613,13 @@ Active technical indicator values: ${indicatorsString}.`}`;
         const network = coin === 'USDT' ? 'TRC-20' : 'SegWit';
 
         const textTemplates = [
-          `Withdrawal credited of $${withdrawAmount} securely processed via ${coin} (${network}) in 3 minutes! Zero fees is standard on LWEX is top tier. 💸🔒\n\nProof of payout attached:`,
+          `Withdrawal credited of $${withdrawAmount} securely processed via ${coin} (${network}) in 3 minutes! Zero fees is standard on KNEX is top tier. 💸🔒\n\nProof of payout attached:`,
           `Withdrawal success: My options profit of $${withdrawAmount} ${coin} just landed in my external wallet! Extremely safe. Check proof screenshot below.`,
           `Simulated instant payout proof: Paid $${withdrawAmount} ${coin} with flat tx cost. Truly stellar speed on TRC-20 layout!`
         ];
 
         text = textTemplates[Math.floor(Math.random() * textTemplates.length)];
-        const screenshotUrl = `https://dummyimage.com/600x400/0f172a/10b981.png&text=LWEX+${coin}+WITHDRAWAL+SUCCESS+$${withdrawAmount}`;
+        const screenshotUrl = `https://dummyimage.com/600x400/0f172a/10b981.png&text=KNEX+${coin}+WITHDRAWAL+SUCCESS+$${withdrawAmount}`;
         text += `\n\n🖼️ <b>[SCREENSHOT PROOF]:</b> ${screenshotUrl}`;
       }
 
@@ -4651,7 +4651,7 @@ Active technical indicator values: ${indicatorsString}.`}`;
         const potentialUsernames = [
           '@deriv_expert_jack', '@binary_pro_sarah', '@option_scalper_dave', 
           '@mflow_master_mike', '@crypto_genius_lisa', '@payout_hunter_ryan',
-          '@vix_trader_elena', '@lwex_fanatic_sam', '@synthetic_hawk_tom',
+          '@vix_trader_elena', '@knex_fanatic_sam', '@synthetic_hawk_tom',
           '@options_oracle_amy', '@payout_reaper_ken', '@leveraged_alpha_guy',
           '@vix_god_trading', '@binary_whale_88', '@index_ninja'
         ];
@@ -4681,7 +4681,7 @@ Active technical indicator values: ${indicatorsString}.`}`;
 
           telegramMockUsers.push(newMockUser);
 
-          const welcomeMsg = `🤖 <b>Wizard Bot Auto-Recruiter Sweep:</b>\n\nI have automatically recruited and invited <b>${newUserHandle}</b> from external community group <i>"${originGroup}"</i> to join our premium trading circle!\n\nUser welcomingly registered on https://lwex.onrender.com/ and joined! Welcome! 📈🚀`;
+          const welcomeMsg = `🤖 <b>Wizard Bot Auto-Recruiter Sweep:</b>\n\nI have automatically recruited and invited <b>${newUserHandle}</b> from external community group <i>"${originGroup}"</i> to join our premium trading circle!\n\nUser welcomingly registered on https://knex.onrender.com/ and joined! Welcome! 📈🚀`;
 
           telegramLogs.push({
             id: `tg-${Date.now()}-${Math.random()}`,
@@ -4767,7 +4767,7 @@ Active technical indicator values: ${indicatorsString}.`}`;
         '@option_wolf', '@binary_bull', '@deriv_whisperer', '@payout_rebel',
         '@margin_calls_x', '@mflow_shadow', '@crypto_vanguard', '@scalping_phantom',
         '@alpha_binary_trader', '@binary_prophet', '@forex_hunter', '@wiz_follower',
-        '@payout_beast', '@deriv_daddy', '@lwex_bull', '@binary_sensei'
+        '@payout_beast', '@deriv_daddy', '@knex_bull', '@binary_sensei'
       ];
       
       const convertedUsers: string[] = [];
@@ -5247,9 +5247,9 @@ Active technical indicator values: ${indicatorsString}.`}`;
       const command = text.trim();
 
       if (command.startsWith('/start')) {
-        responseText = `🔮 Welcome to LWEX Exchange Official Portal Bot! We have peered into MFLOW and established a preloaded $25,678.91 USDT demo balance for you.\n\nType /invite to view extra Bonus Incentives! Or use /register to start, and /signals to scan technical options.`;
+        responseText = `🔮 Welcome to KNEX Exchange Official Portal Bot! We have peered into MFLOW and established a preloaded $25,678.91 USDT demo balance for you.\n\nType /invite to view extra Bonus Incentives! Or use /register to start, and /signals to scan technical options.`;
       } else if (command.startsWith('/register')) {
-        responseText = `🚀 Onboard LWEX Exchange: Open the application page, click "Register Now" to claim a fully active $25,678.91 USDT test wallet. Ready for binary options!`;
+        responseText = `🚀 Onboard KNEX Exchange: Open the application page, click "Register Now" to claim a fully active $25,678.91 USDT test wallet. Ready for binary options!`;
         if (!telegramMockUsers.some(u => u.username === cleanUser)) {
           telegramMockUsers.push({
             id: `tg-u-${Date.now()}`,
@@ -5260,7 +5260,7 @@ Active technical indicator values: ${indicatorsString}.`}`;
         }
       } else if (command.startsWith('/invite') || command.startsWith('/bonus')) {
         const groupLnk = telegramConfig.groupLink || 'https://t.me/+V9H-AvU6wl43MTNk';
-        responseText = `<b>🎁 INVITATION BONUS & PROMOTIONAL LAUNCH! 🎁</b>\n\nInvite your trading circles and double your active investment wallet matches!\n\n✨ <b>200% FIRST DEPOSIT MATCH BONUS</b> ✨\nMake your first complete deposit on LWEX and execute more than 5 trades in Real Mode to unlock a magnificent <b>200% Cash Balance match</b> automatically credited to your wallet!\n\n🌟 <b>Referrals Community Reward:</b> Share this Telegram group connection link with your friends to attract elite members and claim shared VIP indicators!\n\n👥 <b>Group Invitation Link:</b> ${groupLnk}\n\n<i>Help us grow the largest options trading circle on the planet! 📈🔥</i>`;
+        responseText = `<b>🎁 INVITATION BONUS & PROMOTIONAL LAUNCH! 🎁</b>\n\nInvite your trading circles and double your active investment wallet matches!\n\n✨ <b>200% FIRST DEPOSIT MATCH BONUS</b> ✨\nMake your first complete deposit on KNEX and execute more than 5 trades in Real Mode to unlock a magnificent <b>200% Cash Balance match</b> automatically credited to your wallet!\n\n🌟 <b>Referrals Community Reward:</b> Share this Telegram group connection link with your friends to attract elite members and claim shared VIP indicators!\n\n👥 <b>Group Invitation Link:</b> ${groupLnk}\n\n<i>Help us grow the largest options trading circle on the planet! 📈🔥</i>`;
       } else if (command.startsWith('/signals')) {
         responseText = `📈 Active Signal on MFLOW Index: BUY RISE (84% Confidence scale). Support: $25,621.00. Execute binary contract trigger directly on the main page.`;
       } else if (command.startsWith('/mflow')) {
@@ -5308,14 +5308,14 @@ Active technical indicator values: ${indicatorsString}.`}`;
       
       let template = '';
       if (type === 'campaign') {
-        template = telegramConfig.templateVIPCampaign || `<b>[LWEX 🎁 VIP Promo Announcement]</b>\n\n{text}\n\n👉 Trade Now: {link}`;
+        template = telegramConfig.templateVIPCampaign || `<b>[KNEX 🎁 VIP Promo Announcement]</b>\n\n{text}\n\n👉 Trade Now: {link}`;
       } else if (type === 'alert') {
-        template = telegramConfig.templateAlert || `<b>[LWEX 🔔 Urgent Network Watch]</b>\n\n{text}\n\n👉 Trade Now: {link}`;
+        template = telegramConfig.templateAlert || `<b>[KNEX 🔔 Urgent Network Watch]</b>\n\n{text}\n\n👉 Trade Now: {link}`;
       } else {
-        template = telegramConfig.templateSignal || `<b>[LWEX 📈 Dynamic Options Prediction]</b>\n\n{text}\n\n👉 Trade Now: {link}`;
+        template = telegramConfig.templateSignal || `<b>[KNEX 📈 Dynamic Options Prediction]</b>\n\n{text}\n\n👉 Trade Now: {link}`;
       }
 
-      const link = 'https://lwex.onrender.com/';
+      const link = 'https://knex.onrender.com/';
       const formattedMessage = template
         .replace(/{prefix}/g, prefix)
         .replace(/{text}/g, text)
