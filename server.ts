@@ -98,6 +98,15 @@ function getSqliteInstance() {
         created_at TEXT NOT NULL
       );
 
+      CREATE TABLE IF NOT EXISTS security_audit_logs (
+        id TEXT PRIMARY KEY,
+        user_id TEXT,
+        action TEXT NOT NULL,
+        details TEXT,
+        ip_address TEXT,
+        created_at TEXT NOT NULL
+      );
+
       CREATE TABLE IF NOT EXISTS users (
         id TEXT PRIMARY KEY,
         email TEXT UNIQUE NOT NULL,
@@ -482,6 +491,15 @@ function getD1Database() {
             message TEXT NOT NULL,
             type TEXT DEFAULT 'info',
             is_read INTEGER DEFAULT 0,
+            created_at TEXT NOT NULL
+          );
+
+          CREATE TABLE IF NOT EXISTS security_audit_logs (
+            id TEXT PRIMARY KEY,
+            user_id TEXT,
+            action TEXT NOT NULL,
+            details TEXT,
+            ip_address TEXT,
             created_at TEXT NOT NULL
           );
 
@@ -2665,6 +2683,46 @@ Active technical indicator values: ${indicatorsString}.`}`;
       });
     } catch (err: any) {
       return res.status(500).json({ success: false, valid: false, message: err.message });
+    }
+  });
+
+  // Get active sessions
+  app.get('/api/auth/sessions', async (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    try {
+      const authHeader = req.headers.authorization;
+      const token = authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : '';
+      if (!token) return res.status(401).json({ success: false, message: 'Unauthorized' });
+
+      const db = getD1Database();
+      const session = await db.prepare('SELECT user_id, session_id FROM user_sessions WHERE token = ?').bind(token).first() as any;
+      if (!session) return res.status(401).json({ success: false, message: 'Invalid session' });
+
+      const sessionsRes = await db.prepare('SELECT session_id, device_id, created_at, expires_at FROM user_sessions WHERE user_id = ? ORDER BY created_at DESC').all() as any;
+      const rows = sessionsRes.results || sessionsRes || [];
+      return res.json({ success: true, sessions: rows, currentSessionId: session.session_id });
+    } catch (err: any) {
+      return res.status(500).json({ success: false, message: err.message });
+    }
+  });
+
+  // Revoke specific session
+  app.post('/api/auth/sessions/:sessionId/revoke', async (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    try {
+      const authHeader = req.headers.authorization;
+      const token = authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : '';
+      if (!token) return res.status(401).json({ success: false, message: 'Unauthorized' });
+
+      const db = getD1Database();
+      const session = await db.prepare('SELECT user_id FROM user_sessions WHERE token = ?').bind(token).first() as any;
+      if (!session) return res.status(401).json({ success: false, message: 'Invalid session' });
+
+      const targetSessionId = req.params.sessionId;
+      await db.prepare('DELETE FROM user_sessions WHERE session_id = ? AND user_id = ?').bind(targetSessionId, session.user_id).run();
+      return res.json({ success: true, message: 'Session revoked successfully.' });
+    } catch (err: any) {
+      return res.status(500).json({ success: false, message: err.message });
     }
   });
 
