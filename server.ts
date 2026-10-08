@@ -3236,6 +3236,89 @@ Active technical indicator values: ${indicatorsString}.`}`;
     return res.json({ success: true, orderId: id });
   });
 
+  // Update P2P Order / Market Offer Endpoint
+  app.post('/api/p2p/orders/:id/update', async (req, res) => {
+    try {
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith('Bearer ')) return res.status(401).json({ success: false, message: 'Unauthorized' });
+      const userId = authHeader.split(' ')[1];
+      const orderId = req.params.id;
+      const { price, amount, min_limit, max_limit, paymentMethod, terms, status } = req.body;
+
+      const db = getD1Database();
+      let order: any = null;
+      if (db.prepare) {
+        order = await db.prepare('SELECT * FROM p2p_orders WHERE id = ?').bind(orderId).first();
+      } else {
+        const r = await db.query('SELECT * FROM p2p_orders WHERE id = $1', [orderId]);
+        order = r.rows[0];
+      }
+
+      if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
+      if (order.user_id !== userId && userId !== 'admin-user') {
+        return res.status(403).json({ success: false, message: 'Not authorized to edit this order' });
+      }
+
+      if (db.prepare) {
+        await db.prepare(`
+          UPDATE p2p_orders 
+          SET price = ?, amount = ?, min_limit = ?, max_limit = ?, paymentMethod = ?, terms = ?, status = ?
+          WHERE id = ?
+        `).bind(
+          Number(price) || order.price,
+          Number(amount) || order.amount,
+          Number(min_limit) || order.min_limit,
+          Number(max_limit) || order.max_limit,
+          paymentMethod || order.paymentMethod,
+          terms || order.terms,
+          status || order.status,
+          orderId
+        ).run();
+      } else {
+        await db.query(`
+          UPDATE p2p_orders 
+          SET price = $1, amount = $2, min_limit = $3, max_limit = $4, paymentMethod = $5, terms = $6, status = $7
+          WHERE id = $8
+        `, [
+          Number(price) || order.price,
+          Number(amount) || order.amount,
+          Number(min_limit) || order.min_limit,
+          Number(max_limit) || order.max_limit,
+          paymentMethod || order.paymentMethod,
+          terms || order.terms,
+          status || order.status,
+          orderId
+        ]);
+      }
+
+      return res.json({ success: true, message: 'Order updated successfully' });
+    } catch (err: any) {
+      return res.status(500).json({ success: false, message: err.message });
+    }
+  });
+
+  // User Profile Update Endpoint
+  app.post('/api/user/profile', async (req, res) => {
+    try {
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith('Bearer ')) return res.status(401).json({ success: false, message: 'Unauthorized' });
+      const userId = authHeader.split(' ')[1];
+      const { fullName, phone } = req.body;
+      const db = getD1Database();
+      const now = new Date().toISOString();
+
+      if (db.prepare) {
+        await db.prepare('UPDATE users SET full_name = ?, phone = ?, updated_at = ? WHERE id = ?').bind(fullName || '', phone || '', now, userId).run();
+      } else {
+        await db.query('UPDATE users SET full_name = $1, phone = $2, updated_at = $3 WHERE id = $4', [fullName || '', phone || '', now, userId]);
+      }
+      return res.json({ success: true, message: 'Profile updated successfully' });
+    } catch (err: any) {
+      return res.status(500).json({ success: false, message: err.message });
+    }
+  });
+
+
   app.post('/api/p2p/orders/:id/mark-paid', async (req, res) => {
     const db = getD1Database();
     await db.prepare("UPDATE p2p_orders SET status = 'paid' WHERE id = ?").bind(req.params.id).run();
