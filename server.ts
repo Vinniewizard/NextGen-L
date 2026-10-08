@@ -107,6 +107,14 @@ function getSqliteInstance() {
         created_at TEXT NOT NULL
       );
 
+      CREATE TABLE IF NOT EXISTS admin_support_chats (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        sender TEXT NOT NULL,
+        message TEXT NOT NULL,
+        created_at TEXT NOT NULL
+      );
+
       CREATE TABLE IF NOT EXISTS users (
         id TEXT PRIMARY KEY,
         email TEXT UNIQUE NOT NULL,
@@ -500,6 +508,14 @@ function getD1Database() {
             action TEXT NOT NULL,
             details TEXT,
             ip_address TEXT,
+            created_at TEXT NOT NULL
+          );
+
+          CREATE TABLE IF NOT EXISTS admin_support_chats (
+            id TEXT PRIMARY KEY,
+            user_id TEXT NOT NULL,
+            sender TEXT NOT NULL,
+            message TEXT NOT NULL,
             created_at TEXT NOT NULL
           );
 
@@ -6003,6 +6019,64 @@ Active technical indicator values: ${indicatorsString}.`}`;
       return res.json({ success: true, message: 'All user account balances cleared to $0.00.' });
     } catch (error: any) {
       return res.status(500).json({ success: false, message: error.message });
+    }
+  });
+
+  // Get support chat messages for a user
+  app.get('/api/support/chats/:userId', async (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    try {
+      const userId = req.params.userId;
+      const db = getD1Database();
+      const messagesRes = await db.prepare('SELECT * FROM admin_support_chats WHERE user_id = ? ORDER BY created_at ASC').all() as any;
+      const rows = messagesRes.results || messagesRes || [];
+      return res.json({ success: true, messages: rows });
+    } catch (err: any) {
+      return res.status(500).json({ success: false, message: err.message });
+    }
+  });
+
+  // Admin get all support chats overview
+  app.get('/api/admin/support/chats', async (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    try {
+      const adminKey = req.headers['x-admin-key'];
+      if (adminKey !== process.env.ADMIN_KEY && adminKey !== 'admin-secret-key') {
+        return res.status(403).json({ success: false, message: 'Unauthorized' });
+      }
+      const db = getD1Database();
+      const chatsRes = await db.prepare('SELECT * FROM admin_support_chats ORDER BY created_at DESC').all() as any;
+      const rows = chatsRes.results || chatsRes || [];
+      return res.json({ success: true, chats: rows });
+    } catch (err: any) {
+      return res.status(500).json({ success: false, message: err.message });
+    }
+  });
+
+  // Send support chat message (user or admin)
+  app.post('/api/support/chats', async (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    try {
+      const { userId, sender, message } = req.body;
+      if (!userId || !message) {
+        return res.status(400).json({ success: false, message: 'userId and message are required.' });
+      }
+      const db = getD1Database();
+      const chatId = `chat-${crypto.randomBytes(8).toString('hex')}`;
+      const now = new Date().toISOString();
+
+      await db.prepare(
+        'INSERT INTO admin_support_chats (id, user_id, sender, message, created_at) VALUES (?, ?, ?, ?, ?)'
+      ).bind(chatId, userId, sender || 'user', message, now).run();
+
+      const chatMsg = { id: chatId, user_id: userId, sender: sender || 'user', message, created_at: now };
+
+      // Broadcast real-time via WebSocket to user and admin rooms
+      broadcastToUser(userId, { type: 'SUPPORT_CHAT_MESSAGE', message: chatMsg });
+
+      return res.json({ success: true, message: chatMsg });
+    } catch (err: any) {
+      return res.status(500).json({ success: false, message: err.message });
     }
   });
 
