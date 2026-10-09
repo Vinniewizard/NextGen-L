@@ -343,11 +343,11 @@ export default function Header({
             </button>
 
             {/* Admin Guard Console */}
-            {(currentUser?.email === 'admin@knex.com' || currentUser?.email === 'admin@knex.com' || currentUser?.email === 'admin@derive.com') && onOpenAdmin && (
+            {onOpenAdmin && (
               <button
                 onClick={onOpenAdmin}
                 className="rounded-lg p-1.5 md:p-2 border border-rose-500/20 bg-rose-500/10 text-rose-400 hover:bg-rose-500/25 animate-pulse cursor-pointer flex-shrink-0"
-                title="Knex Guard Console"
+                title="Knex Admin Console"
               >
                 <ShieldCheck className="h-3 w-3 md:h-3.5 md:w-3.5" />
               </button>

@@ -966,8 +966,8 @@ export default function CashierModal({
                     >
                       <RefreshCw className="w-5 h-5 text-yellow-400 shrink-0" />
                       <div>
-                        <span className="font-black text-xs block text-white">NOWPayments Crypto</span>
-                        <span className="text-[9px] text-slate-400 block">BTC, ETH, USDT</span>
+                        <span className="font-black text-xs block text-white">External Wallet (NOWPayments)</span>
+                        <span className="text-[9px] text-yellow-400 block font-bold">Receive Crypto (1% Fee)</span>
                       </div>
                     </button>
                   )}
@@ -996,6 +996,15 @@ export default function CashierModal({
 
             {isCryptoRoute && (
               <div className="space-y-4">
+                <div className="p-3.5 rounded-xl border bg-yellow-500/10 border-yellow-500/30 text-yellow-300 text-xs space-y-1">
+                  <div className="font-bold flex items-center gap-1.5">
+                    <span>🌐 External Wallet Deposit (NOWPayments)</span>
+                  </div>
+                  <p className="text-[11px] text-slate-300 leading-relaxed">
+                    Transfer crypto from any external wallet (Binance, MetaMask, TrustWallet). A 1% service fee is automatically retained, and 99% is credited instantly to your real trading balance upon blockchain confirmation.
+                  </p>
+                </div>
+
                 {/* Cryptocurrency selection dropdown as requested */}
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <div className="space-y-1.5">
