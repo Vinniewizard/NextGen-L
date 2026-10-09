@@ -6299,6 +6299,14 @@ Active technical indicator values: ${indicatorsString}.`}`;
     }
   });
 
+  // Ensure secure-admin route is always accessible
+  app.get('/secure-admin', (req, res) => {
+    res.sendFile(path.resolve(process.cwd(), 'index.html'));
+  });
+  app.get('/secure-admin/*', (req, res) => {
+    res.sendFile(path.resolve(process.cwd(), 'index.html'));
+  });
+
   // Serve static files / Vite middleware handles HMR
   const distPath = path.join(process.cwd(), 'dist');
   const indexHtmlPath = path.join(distPath, 'index.html');
