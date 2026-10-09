@@ -18,9 +18,11 @@ import PriceAlertsManager from './components/PriceAlertsManager';
 import Walkthrough from './components/Walkthrough';
 import WelcomeModal from './components/WelcomeModal';
 import TradeValidationChecklistModal from './components/TradeValidationChecklistModal';
+import MarketingHub from './components/MarketingHub';
 import { ASSETSList } from './data';
 import { Asset, Tick, Contract, TradeHistoryItem, Account, IndicatorConfig, ContractType, PriceAlert, PendingLimitOrder } from './types';
 import { 
+  Megaphone,
   Bot, 
   HelpCircle, 
   Compass,
@@ -1783,6 +1785,7 @@ export default function App() {
   };
 
   const [isInviteOpen, setIsInviteOpen] = useState(false);
+  const [isMarketingOpen, setIsMarketingOpen] = useState(false);
   const [authModalInitialView, setAuthModalInitialView] = useState<'login' | 'register' | 'forgot_password' | 'reset_password'>('login');
   
   const handleTriggerAuth = (view: 'login' | 'register' | 'forgot_password' | 'reset_password') => {
@@ -3891,6 +3894,27 @@ export default function App() {
             </div>
             {!desktopSidebarCollapsed && (
               <span className="text-[8px] bg-rose-500 text-white font-black px-1.5 py-0.5 rounded-full animate-bounce shrink-0">HOT</span>
+            )}
+          </button>
+
+          <button 
+            onClick={() => { 
+              setIsMarketingOpen(true);
+              setSidebarOpen(false); 
+            }}
+            className={`flex items-center ${desktopSidebarCollapsed ? 'lg:justify-center p-2.5' : 'justify-between px-3.5 py-2.5'} w-full rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              isMarketingOpen
+                ? 'bg-amber-500 text-slate-950 font-black shadow-md'
+                : 'text-slate-450 hover:bg-slate-900/50 hover:text-white'
+            }`}
+            title={desktopSidebarCollapsed ? "Marketing & Posters" : undefined}
+          >
+            <div className={`flex items-center ${desktopSidebarCollapsed ? '' : 'space-x-3'}`}>
+              <Megaphone className="w-4 h-4 text-amber-500 shrink-0" />
+              {!desktopSidebarCollapsed && <span>Marketing & Posters</span>}
+            </div>
+            {!desktopSidebarCollapsed && (
+              <span className="text-[8px] bg-amber-500/20 text-amber-400 font-black px-1.5 py-0.5 rounded uppercase">STUDIO</span>
             )}
           </button>
 
@@ -6389,6 +6413,15 @@ export default function App() {
         currentUser={currentUser}
         theme={theme}
         triggerToast={triggerToast}
+        onOpenMarketing={() => setIsMarketingOpen(true)}
+      />
+
+      <MarketingHub
+        isOpen={isMarketingOpen}
+        onClose={() => setIsMarketingOpen(false)}
+        theme={theme}
+        triggerToast={triggerToast}
+        referralCode={currentUser?.referralCode || currentUser?.fullName || 'KNEXVIP'}
       />
 
       <TradeValidationChecklistModal

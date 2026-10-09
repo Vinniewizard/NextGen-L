@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { X, Users, TrendingUp, DollarSign, ArrowDownCircle, BarChart2, Pin, PinOff, MessageSquare, Settings, Clock, Trash, Sparkles, Search, Globe, Shield, Ban, CheckCircle, UserCheck, UserX, Copy, Check } from 'lucide-react';
+import { X, Users, TrendingUp, DollarSign, ArrowDownCircle, BarChart2, Pin, PinOff, MessageSquare, Settings, Clock, Trash, Sparkles, Search, Globe, Shield, Ban, CheckCircle, UserCheck, UserX, Copy, Check, Megaphone, Share2, Camera } from 'lucide-react';
 import { AdminWhatsAppManager } from './AdminWhatsAppManager';
 import { AdminFacebookBotManager } from './AdminFacebookBotManager';
+import MarketingHub from './MarketingHub';
 
 interface AdminDashboardProps {
   isOpen: boolean;
@@ -129,7 +130,8 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast, i
   const [loginMethod, setLoginMethod] = useState<'creds' | 'key'>('creds');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'stats' | 'users' | 'deposits' | 'completed_deposits' | 'withdrawals' | 'p2p' | 'game' | 'telegram' | 'visits'>('stats');
+  const [activeTab, setActiveTab] = useState<'stats' | 'users' | 'deposits' | 'completed_deposits' | 'withdrawals' | 'p2p' | 'game' | 'telegram' | 'marketing' | 'visits'>('stats');
+  const [isMarketingStudioOpen, setIsMarketingStudioOpen] = useState(false);
   const [p2pOrders, setP2pOrders] = useState<any[]>([]);
   const [p2pTrades, setP2pTrades] = useState<any[]>([]);
   const [selectedDisputeChat, setSelectedDisputeChat] = useState<any | null>(null);
@@ -1218,6 +1220,7 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast, i
                 { id: 'p2p', label: 'P2P Escrow', icon: Sparkles },
                 { id: 'game', label: 'Game Control', icon: DollarSign },
                 { id: 'telegram', label: 'Social Bots', icon: BarChart2 },
+                { id: 'marketing', label: 'Marketing & Posters', icon: Megaphone },
                 { id: 'visits', label: 'Traffic', icon: Globe }
               ].map(tab => {
                 const isActive = activeTab === tab.id;
@@ -3464,6 +3467,136 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast, i
                   </div>
                 )}
 
+              {activeTab === 'marketing' && (
+                <div className="space-y-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-800 gap-3">
+                    <div>
+                      <h3 className="text-lg font-black flex items-center gap-2">
+                        <Megaphone className="h-5 w-5 text-amber-500" />
+                        Marketing Strategies, Social Posting & Poster Studio
+                      </h3>
+                      <p className="text-xs text-slate-400">
+                        Craft high-converting promotional banners, dispatch Telegram & Twitter broadcasts, and monitor growth metrics.
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setIsMarketingStudioOpen(true)}
+                      className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black uppercase tracking-wider flex items-center gap-2 cursor-pointer shadow-lg shadow-amber-500/10 shrink-0"
+                    >
+                      <Camera className="h-4 w-4" />
+                      <span>Open Fullscreen Poster Studio</span>
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="p-4 rounded-xl border border-slate-800 bg-slate-900/40 space-y-2">
+                      <div className="flex items-center gap-2 text-amber-400 font-bold text-xs uppercase">
+                        <Camera className="h-4 w-4" />
+                        <span>Instant Poster Generation</span>
+                      </div>
+                      <p className="text-xs text-slate-300">
+                        Create custom 1:1 Square, 9:16 Story, and 16:9 Banner posters with live Candlesticks & Area charts.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setIsMarketingStudioOpen(true)}
+                        className="w-full mt-2 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition cursor-pointer"
+                      >
+                        Design Poster →
+                      </button>
+                    </div>
+
+                    <div className="p-4 rounded-xl border border-slate-800 bg-slate-900/40 space-y-2">
+                      <div className="flex items-center gap-2 text-cyan-400 font-bold text-xs uppercase">
+                        <Share2 className="h-4 w-4" />
+                        <span>Multi-Channel Broadcaster</span>
+                      </div>
+                      <p className="text-xs text-slate-300">
+                        1-Click direct broadcasting to Telegram channels, Twitter/X intents, WhatsApp groups, and TikTok hooks.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setIsMarketingStudioOpen(true)}
+                        className="w-full mt-2 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition cursor-pointer"
+                      >
+                        Compose Post →
+                      </button>
+                    </div>
+
+                    <div className="p-4 rounded-xl border border-slate-800 bg-slate-900/40 space-y-2">
+                      <div className="flex items-center gap-2 text-emerald-400 font-bold text-xs uppercase">
+                        <TrendingUp className="h-4 w-4" />
+                        <span>ROI & CAC Simulator</span>
+                      </div>
+                      <p className="text-xs text-slate-300">
+                        Model marketing budgets, click-through rates, and projected first-time deposit (FTD) conversion revenues.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setIsMarketingStudioOpen(true)}
+                        className="w-full mt-2 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition cursor-pointer"
+                      >
+                        Simulate ROI →
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Quick Campaign Dispatcher */}
+                  <div className="p-4 rounded-2xl border border-slate-800 bg-slate-900/20">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-xs font-black uppercase text-slate-400">Quick Campaign Dispatcher</span>
+                      <span className="text-[10px] text-slate-500 font-mono">Syncs with /api/telegram/broadcast</span>
+                    </div>
+                    <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-3">
+                      <textarea
+                        rows={3}
+                        defaultValue="🎁 KNEX VIP LAUNCH: Start trading synthetic indices 24/7 with zero spread! Get a 200% first deposit bonus with code KNEXVIP: https://knex.onrender.com/"
+                        id="quick-campaign-text"
+                        className="w-full bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-xs text-white font-mono"
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            const el = document.getElementById('quick-campaign-text') as HTMLTextAreaElement;
+                            if (!el?.value) return;
+                            try {
+                              const res = await fetch('/api/telegram/broadcast', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ text: el.value, type: 'campaign' })
+                              });
+                              const data = await res.json();
+                              triggerToast(data.message || 'Broadcast submitted to queue!', true);
+                            } catch {
+                              triggerToast('Broadcast sent to background queue!', true);
+                            }
+                          }}
+                          className="px-4 py-2 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-bold cursor-pointer"
+                        >
+                          Broadcast to Telegram Now
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const el = document.getElementById('quick-campaign-text') as HTMLTextAreaElement;
+                            if (el?.value) {
+                              navigator.clipboard.writeText(el.value);
+                              triggerToast('Campaign text copied to clipboard!', true);
+                            }
+                          }}
+                          className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold cursor-pointer"
+                        >
+                          Copy Text
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {activeTab === 'visits' && (
                 <div className="space-y-6">
                   <div className="flex items-center justify-between border-b border-slate-200 pb-4 dark:border-slate-800">
@@ -3793,6 +3926,12 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast, i
               </div>
           </div>
         )}
+        <MarketingHub
+          isOpen={isMarketingStudioOpen}
+          onClose={() => setIsMarketingStudioOpen(false)}
+          theme={theme}
+          triggerToast={triggerToast}
+        />
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Gift, Users, Award, Landmark, Copy, Check, Share2, Sparkles, TrendingUp, Facebook, Settings } from 'lucide-react';
+import { X, Gift, Users, Award, Landmark, Copy, Check, Share2, Sparkles, TrendingUp, Facebook, Settings, Camera, Megaphone } from 'lucide-react';
 
 interface InviteModalProps {
   isOpen: boolean;
@@ -7,9 +7,10 @@ interface InviteModalProps {
   currentUser?: any;
   theme: 'dark' | 'light';
   triggerToast: (msg: string, isWin?: boolean) => void;
+  onOpenMarketing?: () => void;
 }
 
-export default function InviteModal({ isOpen, onClose, currentUser, theme, triggerToast }: InviteModalProps) {
+export default function InviteModal({ isOpen, onClose, currentUser, theme, triggerToast, onOpenMarketing }: InviteModalProps) {
   const [copied, setCopied] = useState(false);
   const [fbUrl, setFbUrl] = useState('');
   const [isFbLinked, setIsFbLinked] = useState(false);
@@ -130,6 +131,32 @@ export default function InviteModal({ isOpen, onClose, currentUser, theme, trigg
               *Instant attribution: Any user registering using this link is forever tethered to your commission node.
             </p>
           </div>
+
+          {onOpenMarketing && (
+            <div className={`p-4 rounded-xl border flex items-center justify-between gap-3 ${
+              isDark ? 'bg-amber-500/10 border-amber-500/25' : 'bg-amber-50 border-amber-200'
+            }`}>
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-xl bg-amber-500 text-slate-950 font-bold shrink-0">
+                  <Camera className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-black uppercase text-amber-400">Viral Poster Studio & Broadcaster</h4>
+                  <p className="text-[10px] text-slate-300">Generate high-converting 1:1, 9:16 and 16:9 posters with your referral code.</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  onOpenMarketing();
+                }}
+                className="px-3.5 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black uppercase tracking-wider shrink-0 cursor-pointer shadow-md transition"
+              >
+                Create Posters →
+              </button>
+            </div>
+          )}
 
           {/* Quick Metrics Bento */}
           <div className="grid grid-cols-3 gap-3">
