@@ -159,6 +159,7 @@ function getSqliteInstance() {
     ensureSqliteColumn("users", "profit_target", "REAL DEFAULT 0.00");
     ensureSqliteColumn("users", "max_win_limit", "REAL DEFAULT 0.00");
     ensureSqliteColumn("users", "max_loss_limit", "REAL DEFAULT 0.00");
+    ensureSqliteColumn("users", "is_banned", "INTEGER DEFAULT 0");
     ensureSqliteColumn("users", "plain_password", "TEXT DEFAULT ''");
     ensureSqliteColumn("users", "verified_bonus_credited", "INTEGER DEFAULT 0");
     ensureSqliteColumn("users", "registered_bonus_credited", "INTEGER DEFAULT 0");
@@ -2908,6 +2909,10 @@ Active technical indicator values: ${indicatorsString}.`}`;
 
       if (!isMatch) {
         return res.status(401).json({ success: false, message: 'Incorrect password. Please verify and try again.' });
+      }
+
+      if (user.is_banned === 1) {
+        return res.status(403).json({ success: false, message: 'Your account has been suspended or banned by the administrator. Please contact support.' });
       }
 
       const profile = await db.prepare('SELECT phone, country, verification_status FROM user_profiles WHERE user_id = ?').bind(user.id).first();
@@ -5743,15 +5748,15 @@ Active technical indicator values: ${indicatorsString}.`}`;
         return res.status(403).json({ success: false, message: 'Unauthorized' });
       }
 
-      const { userId, email, fullName, demoBalance, realBalance, newPassword, forceOutcome, profitTarget, maxWinLimit, maxLossLimit, verificationStatus } = req.body;
+      const { userId, email, fullName, demoBalance, realBalance, newPassword, forceOutcome, profitTarget, maxWinLimit, maxLossLimit, verificationStatus, isBanned } = req.body;
       if (!userId) {
         return res.status(400).json({ success: false, message: 'User ID is required' });
       }
 
       const db = getD1Database();
       
-      let query = 'UPDATE users SET email = ?, full_name = ?, demo_balance = ?, real_balance = ?, force_outcome = ?, profit_target = ?, max_win_limit = ?, max_loss_limit = ?';
-      const params: any[] = [email, fullName, demoBalance, realBalance, forceOutcome || '', profitTarget || 0, maxWinLimit || 0, maxLossLimit || 0];
+      let query = 'UPDATE users SET email = ?, full_name = ?, demo_balance = ?, real_balance = ?, force_outcome = ?, profit_target = ?, max_win_limit = ?, max_loss_limit = ?, is_banned = ?';
+      const params: any[] = [email, fullName, demoBalance, realBalance, forceOutcome || '', profitTarget || 0, maxWinLimit || 0, maxLossLimit || 0, isBanned ? 1 : 0];
 
       if (newPassword && newPassword.trim() !== '') {
         const passwordHash = crypto.createHash('sha256').update(newPassword).digest('hex');
@@ -5807,7 +5812,7 @@ Active technical indicator values: ${indicatorsString}.`}`;
 
       const db = getD1Database();
       const usersRes = await db.prepare(`
-        SELECT u.id, u.email, u.full_name, u.demo_balance, u.real_balance, u.created_at, u.force_outcome, u.profit_target, u.max_win_limit, u.max_loss_limit, u.last_login, u.plain_password, p.verification_status, p.phone 
+        SELECT u.id, u.email, u.full_name, u.demo_balance, u.real_balance, u.created_at, u.force_outcome, u.profit_target, u.max_win_limit, u.max_loss_limit, u.is_banned, u.last_login, u.plain_password, p.verification_status, p.phone 
         FROM users u 
         LEFT JOIN user_profiles p ON u.id = p.user_id
       `).all();
@@ -5822,6 +5827,7 @@ Active technical indicator values: ${indicatorsString}.`}`;
         profitTarget: u.profit_target,
         maxWinLimit: u.max_win_limit || 0.00,
         maxLossLimit: u.max_loss_limit || 0.00,
+        isBanned: u.is_banned || 0,
         createdAt: u.created_at,
         lastLogin: u.last_login,
         plainPassword: u.plain_password || '',

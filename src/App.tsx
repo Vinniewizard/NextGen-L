@@ -3266,6 +3266,10 @@ export default function App() {
     customDigit?: number,
     customOffset?: number
   ) => {
+    if (gameSettingsRef.current?.binaryOptionsPaused) {
+      triggerToast('Binary Options trading is currently paused by the administrator.', false);
+      return;
+    }
     const typeToUse = customType || selectedContractType;
     let dirToUse: any = direction;
     if (!dirToUse) {

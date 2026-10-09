@@ -22,6 +22,7 @@ interface User {
   profitTarget?: number;
   maxWinLimit?: number;
   maxLossLimit?: number;
+  isBanned?: number;
   plainPassword?: string;
   createdAt: string;
   lastLogin?: string;
@@ -85,6 +86,11 @@ interface GameSettings {
   maxStake?: number;
   cashoutMode?: 'enabled' | 'disabled' | 'smart';
   payoutRate?: number;
+  binaryOptionsPaused?: boolean;
+  mflowPaused?: boolean;
+  p2pPaused?: boolean;
+  depositsPaused?: boolean;
+  withdrawalsPaused?: boolean;
 }
 
 const PREBUILT_GUIDES = {
@@ -667,7 +673,8 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast }:
           profitTarget: editingUser.profitTarget || 0,
           maxWinLimit: editingUser.maxWinLimit || 0,
           maxLossLimit: editingUser.maxLossLimit || 0,
-          verificationStatus: editingUser.verificationStatus || 'unverified'
+          verificationStatus: editingUser.verificationStatus || 'unverified',
+          isBanned: editingUser.isBanned || 0
         })
       });
       if (res.ok) {
@@ -1626,6 +1633,18 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast }:
                               <option value="rejected">Rejected / Blacklisted</option>
                             </select>
                           </div>
+                          <div className="flex items-center space-x-2.5 pt-1">
+                            <input
+                              type="checkbox"
+                              id="isBannedCheckbox"
+                              checked={editingUser.isBanned === 1}
+                              onChange={e => setEditingUser({ ...editingUser, isBanned: e.target.checked ? 1 : 0 })}
+                              className="accent-red-500 rounded h-4 w-4"
+                            />
+                            <label htmlFor="isBannedCheckbox" className="text-xs font-bold text-red-400 cursor-pointer select-none">
+                              Suspend / Ban Account (Block Login & Trading)
+                            </label>
+                          </div>
                           <div>
                             <label className="text-[10px] uppercase tracking-wider font-bold text-slate-400">Current Login Password</label>
                             <div className={`w-full rounded px-3 py-2 text-sm border font-mono select-all ${theme === 'dark' ? 'bg-slate-900 border-slate-800 text-yellow-500' : 'bg-gray-100 border-gray-300 text-yellow-700'}`}>
@@ -2246,6 +2265,76 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast }:
                         <p className="text-[9px] text-slate-500 italic">
                           Manage user ability to self-liquidate positions before target expiration: disable entirely or restrict to smart mode (prevents cashing out green profits).
                         </p>
+                      </div>
+
+                      <div className="space-y-4 border-t border-slate-800 pt-4">
+                        <label className="text-xs font-bold uppercase text-slate-400 block pb-1">Game & Feature Pause / Resume Controls</label>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                          <label className="flex items-center space-x-2.5 cursor-pointer bg-slate-900/40 p-3 rounded border border-slate-800 hover:border-slate-700 transition-all select-none">
+                            <input
+                              type="checkbox"
+                              checked={!gameSettings.binaryOptionsPaused}
+                              onChange={(e) => setGameSettings({ ...gameSettings, binaryOptionsPaused: !e.target.checked })}
+                              className="accent-green-500 rounded"
+                            />
+                            <div className="flex flex-col">
+                              <span className="text-xs font-bold text-white">Binary Options Trading</span>
+                              <span className="text-[9px] text-slate-500">{gameSettings.binaryOptionsPaused ? 'Paused by Admin' : 'Active'}</span>
+                            </div>
+                          </label>
+
+                          <label className="flex items-center space-x-2.5 cursor-pointer bg-slate-900/40 p-3 rounded border border-slate-800 hover:border-slate-700 transition-all select-none">
+                            <input
+                              type="checkbox"
+                              checked={!gameSettings.mflowPaused}
+                              onChange={(e) => setGameSettings({ ...gameSettings, mflowPaused: !e.target.checked })}
+                              className="accent-green-500 rounded"
+                            />
+                            <div className="flex flex-col">
+                              <span className="text-xs font-bold text-white">MFLOW Index Feeds</span>
+                              <span className="text-[9px] text-slate-500">{gameSettings.mflowPaused ? 'Paused by Admin' : 'Active'}</span>
+                            </div>
+                          </label>
+
+                          <label className="flex items-center space-x-2.5 cursor-pointer bg-slate-900/40 p-3 rounded border border-slate-800 hover:border-slate-700 transition-all select-none">
+                            <input
+                              type="checkbox"
+                              checked={!gameSettings.p2pPaused}
+                              onChange={(e) => setGameSettings({ ...gameSettings, p2pPaused: !e.target.checked })}
+                              className="accent-green-500 rounded"
+                            />
+                            <div className="flex flex-col">
+                              <span className="text-xs font-bold text-white">P2P Marketplace</span>
+                              <span className="text-[9px] text-slate-500">{gameSettings.p2pPaused ? 'Paused by Admin' : 'Active'}</span>
+                            </div>
+                          </label>
+
+                          <label className="flex items-center space-x-2.5 cursor-pointer bg-slate-900/40 p-3 rounded border border-slate-800 hover:border-slate-700 transition-all select-none">
+                            <input
+                              type="checkbox"
+                              checked={!gameSettings.depositsPaused}
+                              onChange={(e) => setGameSettings({ ...gameSettings, depositsPaused: !e.target.checked })}
+                              className="accent-green-500 rounded"
+                            />
+                            <div className="flex flex-col">
+                              <span className="text-xs font-bold text-white">Deposits System</span>
+                              <span className="text-[9px] text-slate-500">{gameSettings.depositsPaused ? 'Paused by Admin' : 'Active'}</span>
+                            </div>
+                          </label>
+
+                          <label className="flex items-center space-x-2.5 cursor-pointer bg-slate-900/40 p-3 rounded border border-slate-800 hover:border-slate-700 transition-all select-none">
+                            <input
+                              type="checkbox"
+                              checked={!gameSettings.withdrawalsPaused}
+                              onChange={(e) => setGameSettings({ ...gameSettings, withdrawalsPaused: !e.target.checked })}
+                              className="accent-green-500 rounded"
+                            />
+                            <div className="flex flex-col">
+                              <span className="text-xs font-bold text-white">Withdrawals System</span>
+                              <span className="text-[9px] text-slate-500">{gameSettings.withdrawalsPaused ? 'Paused by Admin' : 'Active'}</span>
+                            </div>
+                          </label>
+                        </div>
                       </div>
 
                       <div className="space-y-4 border-t border-slate-800 pt-4">
