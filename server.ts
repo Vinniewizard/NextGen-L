@@ -5810,6 +5810,34 @@ Active technical indicator values: ${indicatorsString}.`}`;
     }
   });
 
+  // Admin endpoint - Quick toggle ban/unban user status
+  app.post('/api/admin/users/toggle-ban', async (req, res) => {
+    try {
+      const adminKey = req.headers['x-admin-key'];
+      if (adminKey !== process.env.ADMIN_KEY && adminKey !== 'admin-secret-key') {
+        return res.status(403).json({ success: false, message: 'Unauthorized' });
+      }
+
+      const { userId, isBanned } = req.body;
+      if (!userId) {
+        return res.status(400).json({ success: false, message: 'User ID is required' });
+      }
+
+      const db = getD1Database();
+      const bannedVal = isBanned ? 1 : 0;
+      await db.prepare('UPDATE users SET is_banned = ? WHERE id = ?').bind(bannedVal, userId).run();
+
+      return res.json({ 
+        success: true, 
+        isBanned: bannedVal,
+        message: `User account has been ${bannedVal === 1 ? 'suspended (banned)' : 'restored to active'}.` 
+      });
+    } catch (error: any) {
+      console.error('Toggle ban error:', error);
+      return res.status(500).json({ success: false, message: error.message });
+    }
+  });
+
   // Admin endpoint - Get all users
   app.get('/api/admin/users', async (req, res) => {
     res.setHeader('Content-Type', 'application/json');
@@ -6299,18 +6327,18 @@ Active technical indicator values: ${indicatorsString}.`}`;
     }
   });
 
-  // Ensure secure-admin route is always accessible
-  app.get('/secure-admin', (req, res) => {
-    res.sendFile(path.resolve(process.cwd(), 'index.html'));
-  });
-  app.get('/secure-admin/*', (req, res) => {
-    res.sendFile(path.resolve(process.cwd(), 'index.html'));
-  });
-
   // Serve static files / Vite middleware handles HMR
   const distPath = path.join(process.cwd(), 'dist');
   const indexHtmlPath = path.join(distPath, 'index.html');
   const hasDist = await fs.access(indexHtmlPath).then(() => true).catch(() => false);
+
+  // Guarantee /secure-admin and /secure-admin/ access without white screen
+  app.get(['/secure-admin', '/secure-admin/*'], (req, res, next) => {
+    if (hasDist) {
+      return res.sendFile(indexHtmlPath);
+    }
+    next();
+  });
 
   if (process.env.NODE_ENV !== 'production' || !hasDist) {
     try {

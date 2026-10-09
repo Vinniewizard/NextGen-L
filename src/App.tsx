@@ -8,7 +8,8 @@ import CashierModal from './components/CashierModal';
 import GuideModal from './components/GuideModal';
 import SettingsModal from './components/SettingsModal';
 import InviteModal from './components/InviteModal';
-const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
+import AdminDashboard from './components/AdminDashboard';
+import { AdminErrorBoundary } from './components/AdminErrorBoundary';
 import FinanceDashboard from './components/FinanceDashboard';
 import P2PMarketplace from './components/P2PMarketplace';
 import AuthModal from './components/AuthModal';
@@ -1681,6 +1682,11 @@ export default function App() {
     payoutRate?: number;
     minStake?: number;
     maxStake?: number;
+    binaryOptionsPaused?: boolean;
+    mflowPaused?: boolean;
+    p2pPaused?: boolean;
+    depositsPaused?: boolean;
+    withdrawalsPaused?: boolean;
   }>({
     globalTrendBias: 0,
     volatilityMultiplier: 1,
@@ -1759,9 +1765,22 @@ export default function App() {
   const [isCashierOpen, setIsCashierOpen] = useState(false);
   const [isGuideOpen, setIsGuideOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [isAdminOpen, setIsAdminOpen] = useState(false);
+  const isDirectAdminUrl = () => {
+    if (typeof window === 'undefined') return false;
+    const path = window.location.pathname.toLowerCase();
+    const searchParams = new URLSearchParams(window.location.search);
+    return path.includes('secure-admin') || searchParams.get('admin') === 'true';
+  };
+  const [isAdminOpen, setIsAdminOpen] = useState(isDirectAdminUrl);
   const [isCopilotOpen, setIsCopilotOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+
+  const handleCloseAdmin = () => {
+    setIsAdminOpen(false);
+    if (typeof window !== 'undefined' && window.location.pathname.toLowerCase().includes('secure-admin')) {
+      window.history.pushState({}, document.title, '/');
+    }
+  };
 
   const [isInviteOpen, setIsInviteOpen] = useState(false);
   const [authModalInitialView, setAuthModalInitialView] = useState<'login' | 'register' | 'forgot_password' | 'reset_password'>('login');
@@ -6483,14 +6502,15 @@ export default function App() {
         initialView={authModalInitialView}
       />
 
-      <Suspense fallback={null}>
+      <AdminErrorBoundary theme={theme} onReset={() => setIsAdminOpen(true)}>
         <AdminDashboard 
           isOpen={isAdminOpen}
-          onClose={() => setIsAdminOpen(false)}
+          onClose={handleCloseAdmin}
           theme={theme}
           triggerToast={triggerToast}
+          isDirectRoute={isDirectAdminUrl()}
         />
-      </Suspense>
+      </AdminErrorBoundary>
 
       <WelcomeModal 
         isOpen={isWelcomeModalOpen} 

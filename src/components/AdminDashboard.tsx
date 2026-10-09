@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { X, Users, TrendingUp, DollarSign, ArrowDownCircle, BarChart2, Pin, PinOff, MessageSquare, Settings, Clock, Trash, Sparkles, Search, Globe } from 'lucide-react';
+import { X, Users, TrendingUp, DollarSign, ArrowDownCircle, BarChart2, Pin, PinOff, MessageSquare, Settings, Clock, Trash, Sparkles, Search, Globe, Shield, Ban, CheckCircle, UserCheck, UserX, Copy, Check } from 'lucide-react';
 import { AdminWhatsAppManager } from './AdminWhatsAppManager';
 import { AdminFacebookBotManager } from './AdminFacebookBotManager';
 
@@ -9,6 +9,7 @@ interface AdminDashboardProps {
   onClose: () => void;
   theme: 'dark' | 'light';
   triggerToast: (text: string, success: boolean) => void;
+  isDirectRoute?: boolean;
 }
 
 interface User {
@@ -103,7 +104,23 @@ const PREBUILT_GUIDES = {
   withdrawal: `<b>📥 How to Request a Withdrawal on KNEX</b>\n\nInitiate secure fund settlements anytime:\n\n1. Click on <b>Cashier</b> and navigate to the <b>Withdraw</b> tab.\n2. Ensure your active account is set to <b>Real Balance</b> mode and you have settled funds.\n3. Enter your Crypto standard network (USDT TRC-20 recommended for low fees) and input your destination wallet address.\n4. Verify your identity with your pre-set profile PIN or Two-Factor security challenge.\n5. Submit your withdrawal request. Requests are fully audited by the ledger and settled in 15–30 minutes!`
 };
 
-export default function AdminDashboard({ isOpen, onClose, theme, triggerToast }: AdminDashboardProps) {
+const safeStorageGet = (key: string, fallback: boolean): boolean => {
+  try {
+    if (typeof window === 'undefined') return fallback;
+    const val = localStorage.getItem(key);
+    if (val === null || val === 'undefined') return fallback;
+    return JSON.parse(val);
+  } catch {
+    return fallback;
+  }
+};
+
+const formatMoney = (val: number | string | undefined | null): string => {
+  const num = typeof val === 'number' ? val : parseFloat(String(val || 0));
+  return (isNaN(num) ? 0 : num).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+};
+
+export default function AdminDashboard({ isOpen, onClose, theme, triggerToast, isDirectRoute }: AdminDashboardProps) {
   const [users, setUsers] = useState<User[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
   const [adminKey, setAdminKey] = useState('');
@@ -123,7 +140,6 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast }:
   const [visitsData, setVisitsData] = useState<{
     visitsCount: number;
     uniqueVisitors: number;
-    knexCount?: number;
     knexCount?: number;
     recentVisits: any[];
   } | null>(null);
@@ -149,12 +165,9 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast }:
     payoutRate: 95.5
   });
   const [isGameLoading, setIsGameLoading] = useState(false);
-  const [demoModeEnabled, setDemoModeEnabled] = useState(
-    JSON.parse(localStorage.getItem('knex_admin_demo_enabled') ?? localStorage.getItem('knex_admin_demo_enabled') ?? 'true')
-  );
-  const [realModeEnabled, setRealModeEnabled] = useState(
-    JSON.parse(localStorage.getItem('knex_admin_real_enabled') ?? localStorage.getItem('knex_admin_real_enabled') ?? 'true')
-  );
+  const [demoModeEnabled, setDemoModeEnabled] = useState(() => safeStorageGet('knex_admin_demo_enabled', true));
+  const [realModeEnabled, setRealModeEnabled] = useState(() => safeStorageGet('knex_admin_real_enabled', true));
+  const [copiedUid, setCopiedUid] = useState<string | null>(null);
   const [editingUser, setEditingUser] = useState<User & { newPassword?: string } | null>(null);
   const [userSearchQuery, setUserSearchQuery] = useState('');
   const [userFilterStatus, setUserFilterStatus] = useState<'all' | 'active' | 'inactive'>('all');
@@ -693,6 +706,37 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast }:
     }
   };
 
+  const handleToggleBanUser = async (user: User) => {
+    const currentBanned = user.isBanned === 1;
+    const nextBanned = currentBanned ? 0 : 1;
+    const actionWord = nextBanned === 1 ? 'Ban & Suspend' : 'Unban & Reactivate';
+    
+    try {
+      const res = await fetch('/api/admin/users/toggle-ban', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-key': adminKey
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          isBanned: nextBanned
+        })
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setUsers(prev => prev.map(u => u.id === user.id ? { ...u, isBanned: nextBanned } : u));
+        triggerToast(`${actionWord} complete for ${user.fullName || user.email}`, true);
+      } else {
+        triggerToast(data.message || 'Failed to toggle ban status', false);
+      }
+    } catch (err: any) {
+      console.error('Toggle ban error:', err);
+      triggerToast('Error updating ban status: ' + err.message, false);
+    }
+  };
+
   const handleProcessDeposit = async (id: string, action: 'approve' | 'decline', isConfirmed?: boolean) => {
     if (!isConfirmed) {
       setConfirmingDepositId(id);
@@ -956,186 +1000,252 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast }:
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-black/45 p-4 transition-all backdrop-blur-sm">
-      <div className={`relative w-full max-w-4xl max-h-[90dvh] overflow-y-auto rounded-lg border shadow-2xl transition-all box-border p-6 ${
-        theme === 'dark' ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-100 text-slate-900'
+    <div className={`fixed inset-0 z-50 overflow-hidden flex flex-col ${
+      isDirectRoute 
+        ? 'w-full h-full' 
+        : 'p-0 sm:p-4 sm:flex sm:items-center sm:justify-center bg-black/75 backdrop-blur-md'
+    }`}>
+      <div className={`relative w-full h-full ${
+        isDirectRoute 
+          ? '' 
+          : 'sm:h-auto sm:max-h-[94dvh] sm:max-w-6xl sm:rounded-2xl sm:border'
+      } flex flex-col shadow-2xl transition-all box-border overflow-hidden ${
+        theme === 'dark' ? 'bg-slate-950 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900'
       }`}>
-        <button
-          onClick={onClose}
-          className="absolute right-4 top-4 rounded p-1.5 text-gray-400 hover:bg-gray-100 hover:text-black transition-colors cursor-pointer"
-        >
-          <X className="h-4 w-4" />
-        </button>
+        {/* Global Pinned Header */}
+        <div className={`flex items-center justify-between px-3.5 sm:px-6 py-3 border-b shrink-0 ${
+          theme === 'dark' ? 'border-slate-800/80 bg-slate-950/90' : 'border-slate-200 bg-slate-50/90'
+        } backdrop-blur-md`}>
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="p-2 rounded-xl bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 shrink-0">
+              <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5" />
+            </div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h2 className="text-sm sm:text-lg font-black tracking-tight truncate">
+                  KNEX Admin Console
+                </h2>
+                {isDirectRoute && (
+                  <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-yellow-500/15 text-yellow-500 border border-yellow-500/25 font-mono">
+                    Portal Mode
+                  </span>
+                )}
+                {isAuthenticated && (
+                  <span className="inline-flex items-center gap-1 text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/25 font-mono">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    Online
+                  </span>
+                )}
+              </div>
+              <p className="text-[9px] sm:text-[11px] text-slate-400 truncate">
+                Risk controls, external wallet balances, user accounts & live escrow
+              </p>
+            </div>
+          </div>
 
-        <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-          <TrendingUp className="h-6 w-6" />
-          Admin Dashboard
-        </h2>
+          <div className="flex items-center gap-2 shrink-0">
+            {isAuthenticated && (
+              <button
+                type="button"
+                onClick={() => {
+                  setIsAuthenticated(false);
+                  setAdminKey('');
+                }}
+                className="px-2.5 py-1.5 rounded-lg text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-slate-400 hover:text-white bg-slate-900/60 hover:bg-slate-900 border border-slate-800 transition cursor-pointer"
+                title="Log out from console"
+              >
+                Log Out
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-1.5 sm:p-2 rounded-lg text-slate-400 hover:text-white bg-slate-900/40 hover:bg-slate-800 border border-slate-800/80 transition-all cursor-pointer"
+              title={isDirectRoute ? "Exit to Trading Terminal" : "Close"}
+            >
+              <X className="h-4 w-4 sm:h-5 sm:w-5" />
+            </button>
+          </div>
+        </div>
 
         {!isAuthenticated ? (
-          <div className="space-y-6 max-w-md">
-            {/* Login Mode Tabs */}
-            <div className={`flex p-1 rounded-lg max-w-xs gap-1 border ${
-              theme === 'dark' ? 'bg-slate-900/65 border-slate-800' : 'bg-slate-100 border-slate-200'
-            }`}>
-              <button
-                type="button"
-                onClick={() => setLoginMethod('creds')}
-                className={`flex-1 px-3 py-1.5 rounded-md text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${
-                  loginMethod === 'creds' 
-                    ? 'bg-yellow-500 text-slate-950 font-extrabold shadow-sm'
-                    : theme === 'dark' ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                GADMIN Login
-              </button>
-              <button
-                type="button"
-                onClick={() => setLoginMethod('key')}
-                className={`flex-1 px-3 py-1.5 rounded-md text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${
-                  loginMethod === 'key' 
-                    ? 'bg-yellow-500 text-slate-950 font-extrabold shadow-sm'
-                    : theme === 'dark' ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                Security Key
-              </button>
-            </div>
+          <div className="flex-1 overflow-y-auto p-4 sm:p-8 flex items-center justify-center">
+            <div className="w-full max-w-md mx-auto space-y-6">
+              <div className="text-center space-y-1">
+                <div className="inline-flex p-3 rounded-2xl bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 mb-2">
+                  <Shield className="h-7 w-7" />
+                </div>
+                <h3 className="text-xl font-black tracking-tight">Super Administrator Access</h3>
+                <p className="text-xs text-slate-400">Authenticate session credentials to unlock exchange control systems.</p>
+              </div>
 
-            <form onSubmit={handleLogin} className="space-y-4">
-              {loginMethod === 'creds' ? (
-                <>
+              {/* Login Mode Tabs */}
+              <div className={`flex p-1 rounded-lg w-full gap-1 border ${
+                theme === 'dark' ? 'bg-slate-900/65 border-slate-800' : 'bg-slate-100 border-slate-200'
+              }`}>
+                <button
+                  type="button"
+                  onClick={() => setLoginMethod('creds')}
+                  className={`flex-1 py-2 rounded-md text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer text-center ${
+                    loginMethod === 'creds' 
+                      ? 'bg-yellow-500 text-slate-950 font-extrabold shadow-sm'
+                      : theme === 'dark' ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  GADMIN Login
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLoginMethod('key')}
+                  className={`flex-1 py-2 rounded-md text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer text-center ${
+                    loginMethod === 'key' 
+                      ? 'bg-yellow-500 text-slate-950 font-extrabold shadow-sm'
+                      : theme === 'dark' ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  Security Key
+                </button>
+              </div>
+
+              <form onSubmit={handleLogin} className="space-y-4">
+                {loginMethod === 'creds' ? (
+                  <>
+                    <div>
+                      <label className="block text-xs font-black uppercase tracking-wider text-slate-400 mb-1.5">
+                        Admin Username
+                      </label>
+                      <input
+                        type="text"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        placeholder="Enter Username (e.g. GADMIN)"
+                        required
+                        className={`w-full rounded-lg px-3.5 py-3 text-sm font-semibold border transition-all ${
+                          theme === 'dark'
+                            ? 'bg-slate-900 border-slate-800 text-white focus:border-yellow-500'
+                            : 'bg-white border-gray-200 text-black focus:border-yellow-500'
+                        }`}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-black uppercase tracking-wider text-slate-400 mb-1.5">
+                        Admin Password
+                      </label>
+                      <input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Enter Password (e.g. GADMIN)"
+                        required
+                        className={`w-full rounded-lg px-3.5 py-3 text-sm font-semibold border transition-all ${
+                          theme === 'dark'
+                            ? 'bg-slate-900 border-slate-800 text-white focus:border-yellow-500'
+                            : 'bg-white border-gray-200 text-black focus:border-yellow-500'
+                        }`}
+                      />
+                    </div>
+                  </>
+                ) : (
                   <div>
                     <label className="block text-xs font-black uppercase tracking-wider text-slate-400 mb-1.5">
-                      Admin Username
-                    </label>
-                    <input
-                      type="text"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      placeholder="Enter Username (e.g. GADMIN)"
-                      required
-                      className={`w-full rounded px-3 py-2.5 text-xs font-semibold border transition-all ${
-                        theme === 'dark'
-                          ? 'bg-slate-900 border-slate-800 text-white focus:border-yellow-500'
-                          : 'bg-white border-gray-200 text-black focus:border-yellow-500'
-                      }`}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-black uppercase tracking-wider text-slate-400 mb-1.5">
-                      Admin Password
+                      Security Access Key
                     </label>
                     <input
                       type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Enter Password (e.g. GADMIN)"
+                      value={adminKey}
+                      onChange={(e) => setAdminKey(e.target.value)}
+                      placeholder="Enter security access token"
                       required
-                      className={`w-full rounded px-3 py-2.5 text-xs font-semibold border transition-all ${
+                      className={`w-full rounded-lg px-3.5 py-3 text-sm font-semibold border transition-all ${
                         theme === 'dark'
                           ? 'bg-slate-900 border-slate-800 text-white focus:border-yellow-500'
                           : 'bg-white border-gray-200 text-black focus:border-yellow-500'
                       }`}
                     />
                   </div>
-                </>
-              ) : (
-                <div>
-                  <label className="block text-xs font-black uppercase tracking-wider text-slate-400 mb-1.5">
-                    Security Access Key
-                  </label>
-                  <input
-                    type="password"
-                    value={adminKey}
-                    onChange={(e) => setAdminKey(e.target.value)}
-                    placeholder="Enter security access token"
-                    required
-                    className={`w-full rounded px-3 py-2.5 text-xs font-semibold border transition-all ${
-                      theme === 'dark'
-                        ? 'bg-slate-900 border-slate-800 text-white focus:border-yellow-500'
-                        : 'bg-white border-gray-200 text-black focus:border-yellow-500'
-                    }`}
-                  />
-                </div>
-              )}
+                )}
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-yellow-500 hover:bg-yellow-600 text-slate-950 font-black text-xs uppercase tracking-widest py-3 rounded transition-all disabled:opacity-50 mt-4 cursor-pointer"
-              >
-                {loading ? 'Authenticating...' : 'Access Admin Panel'}
-              </button>
-            </form>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-yellow-500 hover:bg-yellow-400 text-slate-950 font-black text-xs uppercase tracking-widest py-3.5 rounded-lg transition-all disabled:opacity-50 mt-4 cursor-pointer shadow-lg shadow-yellow-500/20"
+                >
+                  {loading ? 'Authenticating Session...' : 'Authenticate Admin Console'}
+                </button>
+              </form>
+            </div>
           </div>
         ) : (
-          <>
-            {/* Command Desk Header */}
-            <div className={`p-4 rounded-xl border mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 ${theme === 'dark' ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-gray-200'}`}>
-              <div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <h2 className="text-sm font-black tracking-widest text-yellow-500 uppercase">KNEX Admin Terminal</h2>
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                  </span>
-                  <span className="text-[9px] font-black text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded tracking-widest uppercase">Console Online</span>
-                </div>
-                <p className="text-[10px] text-slate-400 mt-1">Authorized execution interface for account control, deposits verification, and outcome adjustments.</p>
+          <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+            {/* Command Desk Top Bar / Backup */}
+            <div className={`px-3.5 sm:px-6 py-2.5 border-b shrink-0 flex flex-wrap items-center justify-between gap-2 ${
+              theme === 'dark' ? 'bg-slate-900/40 border-slate-800/80' : 'bg-slate-100/60 border-slate-200'
+            }`}>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">Environment:</span>
+                <span className="text-[10px] font-mono font-bold text-yellow-500 bg-yellow-500/10 px-2 py-0.5 rounded border border-yellow-500/20">
+                  {users.length} Users Registered
+                </span>
+                <span className="text-[10px] font-mono font-bold text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">
+                  1% Fee Pool: ${formatMoney(stats?.totalFeesCollected || 0)}
+                </span>
               </div>
-              <div className="flex gap-2">
-                <button 
-                  onClick={() => {
-                    const backup = users.map(u => ({ id: u.id, email: u.email, name: u.fullName, real: u.realBalance, dev: u.demoBalance, pw: u.plainPassword }));
-                    const text = JSON.stringify(backup, null, 2);
-                    navigator.clipboard.writeText(text);
-                    alert("System users backup copied successfully!");
-                  }}
-                  className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-[9px] font-black uppercase tracking-wider flex items-center gap-1 cursor-pointer border border-slate-700 transition"
-                >
-                  Backup Accounts Log
-                </button>
-              </div>
+              <button 
+                type="button"
+                onClick={() => {
+                  const backup = users.map(u => ({ id: u.id, email: u.email, name: u.fullName, real: u.realBalance, dev: u.demoBalance, pw: u.plainPassword, deposited: u.totalDeposited }));
+                  const text = JSON.stringify(backup, null, 2);
+                  navigator.clipboard.writeText(text);
+                  triggerToast("System users backup copied to clipboard!", true);
+                }}
+                className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-[9px] font-black uppercase tracking-wider flex items-center gap-1 cursor-pointer border border-slate-700 transition"
+              >
+                <Copy className="h-3 w-3" />
+                <span>Backup Accounts</span>
+              </button>
             </div>
 
-            <div className="flex items-center space-x-1 border-b border-slate-200 dark:border-slate-800 mb-6 overflow-x-auto pb-3">
+            {/* Horizontal Scrollable Tabs Bar */}
+            <div className={`flex items-center space-x-1 border-b px-3 sm:px-6 py-2 overflow-x-auto no-scrollbar shrink-0 ${
+              theme === 'dark' ? 'border-slate-800 bg-slate-950' : 'border-slate-200 bg-slate-50'
+            }`}>
               {[
                 { id: 'stats', label: 'Overview', icon: TrendingUp },
                 { id: 'users', label: 'Users & Balances', icon: Users },
                 { id: 'deposits', label: 'Pending Deposits', icon: ArrowDownCircle },
                 { id: 'completed_deposits', label: 'Completed Deposits', icon: ArrowDownCircle },
                 { id: 'withdrawals', label: 'Withdrawals', icon: ArrowDownCircle },
-                { id: 'p2p', label: 'P2P Escrow & Ads', icon: Sparkles },
-                { id: 'game', label: 'Game Control & A/B Engine', icon: DollarSign },
-                { id: 'telegram', label: 'Telegram & Social Bots', icon: BarChart2 },
-                { id: 'visits', label: 'Traffic & Referrals', icon: Globe }
+                { id: 'p2p', label: 'P2P Escrow', icon: Sparkles },
+                { id: 'game', label: 'Game Control', icon: DollarSign },
+                { id: 'telegram', label: 'Social Bots', icon: BarChart2 },
+                { id: 'visits', label: 'Traffic', icon: Globe }
               ].map(tab => {
                 const isActive = activeTab === tab.id;
                 return (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id as any)}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 text-[9px] font-black uppercase whitespace-nowrap transition-all rounded-lg select-none cursor-pointer ${
+                    className={`flex items-center gap-1.5 px-3 py-1.5 text-[10px] sm:text-xs font-black uppercase whitespace-nowrap transition-all rounded-lg select-none cursor-pointer shrink-0 ${
                       isActive
-                        ? 'bg-yellow-500 text-slate-950 shadow-md scale-[1.01]'
-                        : 'text-slate-400 hover:text-white bg-transparent hover:bg-slate-900/40'
+                        ? 'bg-yellow-500 text-slate-950 shadow-md font-extrabold'
+                        : 'text-slate-400 hover:text-white bg-transparent hover:bg-slate-900/60'
                     }`}
                   >
-                    <tab.icon className="h-3 w-3" />
+                    <tab.icon className="h-3.5 w-3.5" />
                     <span>{tab.label}</span>
                     {tab.id === 'deposits' && pendingDeposits.length > 0 && (
-                      <span className="bg-red-500 text-white text-[8px] font-extrabold px-1 py-0.2 rounded-full leading-none">{pendingDeposits.length}</span>
+                      <span className="bg-red-500 text-white text-[8px] font-extrabold px-1.5 py-0.2 rounded-full leading-none">{pendingDeposits.length}</span>
                     )}
                     {tab.id === 'withdrawals' && withdrawals.filter(w => w.status === 'pending').length > 0 && (
-                      <span className="bg-red-500 text-white text-[8px] font-extrabold px-1 py-0.2 rounded-full leading-none">{withdrawals.filter(w => w.status === 'pending').length}</span>
+                      <span className="bg-red-500 text-white text-[8px] font-extrabold px-1.5 py-0.2 rounded-full leading-none">{withdrawals.filter(w => w.status === 'pending').length}</span>
                     )}
                   </button>
                 );
               })}
             </div>
 
-            <div className="space-y-8">
+            {/* Scrollable Tab Content Container */}
+            <div className="flex-1 overflow-y-auto p-3 sm:p-6 space-y-6">
               {activeTab === 'stats' && stats && (
                 <>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -1403,8 +1513,9 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast }:
                       </div>
                     </div>
 
-                    {/* Table of Results */}
-                    <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
+                    {/* Responsive User List: Desktop Table + Mobile Cards */}
+                    {/* Desktop Table View */}
+                    <div className="hidden md:block overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
                       <table className={`w-full text-sm border-collapse rounded-lg overflow-hidden ${theme === 'dark' ? 'border-slate-800' : 'border-gray-200'}`}>
                         <thead>
                           <tr className={theme === 'dark' ? 'bg-slate-900 border-b border-slate-800' : 'bg-gray-100 border-b border-gray-200'}>
@@ -1412,8 +1523,8 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast }:
                             <th className="p-3 text-left font-bold text-xs uppercase tracking-wider text-slate-400">User Identification</th>
                             <th className="p-3 text-right font-bold text-xs uppercase tracking-wider text-slate-400">Demo Account</th>
                             <th className="p-3 text-right font-bold text-xs uppercase tracking-wider text-slate-400">Real Account</th>
-                            <th className="p-3 text-right font-bold text-xs uppercase tracking-wider text-slate-400">Total Deposited</th>
-                            <th className="p-3 text-left font-bold text-xs uppercase tracking-wider text-slate-400">Last Seen Activity</th>
+                            <th className="p-3 text-right font-bold text-xs uppercase tracking-wider text-cyan-400">Total Deposited</th>
+                            <th className="p-3 text-left font-bold text-xs uppercase tracking-wider text-slate-400">Last Seen</th>
                             <th className="p-3 text-left font-bold text-xs uppercase tracking-wider text-slate-400">Created At</th>
                             <th className="p-3 text-center font-bold text-xs uppercase tracking-wider text-slate-400">Actions</th>
                           </tr>
@@ -1421,35 +1532,60 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast }:
                         <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                           {filtered.length === 0 ? (
                             <tr>
-                              <td colSpan={7} className="text-center py-8 text-xs text-slate-500 italic bg-white dark:bg-slate-900/10">No registered users matched the search filters.</td>
+                              <td colSpan={8} className="text-center py-8 text-xs text-slate-500 italic bg-white dark:bg-slate-900/10">No registered users matched the search filters.</td>
                             </tr>
                           ) : (
                             filtered.map((user) => {
                               const isOnline = user.lastLogin ? (Date.now() - new Date(user.lastLogin).getTime()) < 30000 : false;
+                              const isBanned = user.isBanned === 1;
                               return (
                                 <tr key={user.id} className={`${theme === 'dark' ? 'hover:bg-slate-900/40 bg-slate-950/20' : 'hover:bg-gray-50 bg-white'} transition-colors`}>
-                                  {/* Dynamic presence status identifier */}
+                                  {/* Dynamic presence & ban identifier */}
                                   <td className="p-3">
-                                    <div className="flex items-center gap-1.5 justify-start">
-                                      <span className="relative flex h-2 w-2">
-                                        {isOnline && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>}
-                                        <span className={`relative inline-flex rounded-full h-2 w-2 ${isOnline ? 'bg-emerald-500' : 'bg-slate-500'}`}></span>
-                                      </span>
-                                      <span className={`text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded ${isOnline ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-500/10 text-slate-400'}`}>
-                                        {isOnline ? 'ONLINE' : 'OFFLINE'}
-                                      </span>
+                                    <div className="flex flex-col gap-1 items-start">
+                                      <div className="flex items-center gap-1.5">
+                                        <span className="relative flex h-2 w-2">
+                                          {isOnline && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>}
+                                          <span className={`relative inline-flex rounded-full h-2 w-2 ${isOnline ? 'bg-emerald-500' : 'bg-slate-500'}`}></span>
+                                        </span>
+                                        <span className={`text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded ${isOnline ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-500/10 text-slate-400'}`}>
+                                          {isOnline ? 'ONLINE' : 'OFFLINE'}
+                                        </span>
+                                      </div>
+                                      {isBanned && (
+                                        <span className="px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider bg-rose-500/20 text-rose-400 border border-rose-500/30">
+                                          BANNED
+                                        </span>
+                                      )}
                                     </div>
                                   </td>
                                   
                                   {/* Identity column */}
                                   <td className="p-3 text-left">
-                                    <div className="font-semibold text-xs text-slate-900 dark:text-white">{user.fullName}</div>
+                                    <div className="font-semibold text-xs text-slate-900 dark:text-white flex items-center gap-1.5">
+                                      <span>{user.fullName || 'Anonymous'}</span>
+                                      {isBanned && <Ban className="h-3 w-3 text-rose-400" />}
+                                    </div>
                                     <div className="text-[10px] text-slate-500 font-mono mt-0.5">{user.email}</div>
                                     {user.phone && <div className="text-[10px] text-slate-500 font-mono mt-0.5">📞 {user.phone}</div>}
                                     <div className="text-[9px] text-slate-400 font-mono mt-0.5">UID: {user.id}</div>
                                     <div className="text-[10px] text-amber-500 font-mono font-bold mt-1 bg-amber-500/5 px-1.5 py-0.5 rounded border border-amber-500/10 w-max flex items-center gap-1">
                                       <span>🔑 PW:</span>
                                       <span className="select-all">{user.plainPassword || '(Unknown/Hashed)'}</span>
+                                      <button 
+                                        type="button" 
+                                        onClick={() => {
+                                          if (user.plainPassword) {
+                                            navigator.clipboard.writeText(user.plainPassword);
+                                            setCopiedUid(user.id);
+                                            setTimeout(() => setCopiedUid(null), 1500);
+                                          }
+                                        }}
+                                        className="text-slate-400 hover:text-white ml-1 cursor-pointer"
+                                        title="Copy Password"
+                                      >
+                                        {copiedUid === user.id ? <Check className="h-3 w-3 text-emerald-400" /> : <Copy className="h-3 w-3" />}
+                                      </button>
                                     </div>
                                     
                                     <div className="flex flex-wrap gap-1 mt-1.5">
@@ -1481,22 +1617,25 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast }:
                                           MAX_WIN: ${user.maxWinLimit}
                                         </span>
                                       ) : null}
-                                      {user.maxLossLimit && user.maxLossLimit > 0 ? (
-                                        <span className="px-1.5 py-0.5 rounded text-[8px] font-bold bg-purple-500/10 text-purple-400 border border-purple-500/20 leading-normal">
-                                          MAX_LOSS: ${user.maxLossLimit}
-                                        </span>
-                                      ) : null}
                                     </div>
                                   </td>
 
-                                  {/* balances */}
+                                  {/* Demo balance */}
                                   <td className="p-3 text-right font-mono text-xs font-semibold text-slate-800 dark:text-slate-300">
-                                    ${user.demoBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                    ${formatMoney(user.demoBalance)}
                                   </td>
 
+                                  {/* Real balance */}
                                   <td className="p-3 text-right font-mono text-xs font-bold">
                                     <span className={user.realBalance > 0 ? 'text-emerald-500' : 'text-slate-500'}>
-                                      ${user.realBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                      ${formatMoney(user.realBalance)}
+                                    </span>
+                                  </td>
+
+                                  {/* Total Deposited */}
+                                  <td className="p-3 text-right font-mono text-xs font-bold">
+                                    <span className="inline-block px-2 py-0.5 rounded bg-cyan-500/10 border border-cyan-500/20 text-cyan-400">
+                                      ${formatMoney(user.totalDeposited)}
                                     </span>
                                   </td>
 
@@ -1507,23 +1646,40 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast }:
                                     </div>
                                     {user.lastLogin && (
                                       <div className="text-[9px] text-slate-500 font-mono mt-0.5">
-                                        Synced: {new Date(user.lastLogin).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second: '2-digit'})}
+                                        Synced: {new Date(user.lastLogin).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                                       </div>
                                     )}
                                   </td>
 
+                                  {/* Created date */}
                                   <td className="p-3 text-xs text-slate-500 text-left">
-                                    {new Date(user.createdAt).toLocaleDateString()}
+                                    {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
                                   </td>
 
+                                  {/* Actions */}
                                   <td className="p-3 text-center">
-                                    <button
-                                      type="button"
-                                      onClick={() => setEditingUser({ ...user, newPassword: '' })}
-                                      className="bg-yellow-500 hover:bg-yellow-600 text-slate-950 font-bold px-2.5 py-1 rounded text-[10px] uppercase tracking-wider transition-all shadow hover:shadow-yellow-500/10 border-none cursor-pointer border"
-                                    >
-                                      Edit Details
-                                    </button>
+                                    <div className="flex items-center justify-center gap-1.5">
+                                      <button
+                                        type="button"
+                                        onClick={() => handleToggleBanUser(user)}
+                                        className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1 ${
+                                          isBanned
+                                            ? 'bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-400 border border-emerald-500/30'
+                                            : 'bg-rose-500/15 hover:bg-rose-500/25 text-rose-400 border border-rose-500/30'
+                                        }`}
+                                        title={isBanned ? 'Unban this user' : 'Ban and block this user'}
+                                      >
+                                        {isBanned ? <UserCheck className="h-3 w-3" /> : <Ban className="h-3 w-3" />}
+                                        <span>{isBanned ? 'Unban' : 'Ban'}</span>
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => setEditingUser({ ...user, newPassword: '' })}
+                                        className="bg-yellow-500 hover:bg-yellow-600 text-slate-950 font-bold px-2 py-1 rounded text-[10px] uppercase tracking-wider transition-all shadow hover:shadow-yellow-500/10 cursor-pointer"
+                                      >
+                                        Edit
+                                      </button>
+                                    </div>
                                   </td>
                                 </tr>
                               );
@@ -1531,6 +1687,139 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast }:
                           )}
                         </tbody>
                       </table>
+                    </div>
+
+                    {/* Mobile Card View (Optimized for Small Screens) */}
+                    <div className="block md:hidden space-y-3">
+                      {filtered.length === 0 ? (
+                        <div className="text-center py-8 text-xs text-slate-500 italic rounded-xl border border-dashed border-slate-800 p-4">
+                          No registered users found matching the search filters.
+                        </div>
+                      ) : (
+                        filtered.map((user) => {
+                          const isOnline = user.lastLogin ? (Date.now() - new Date(user.lastLogin).getTime()) < 30000 : false;
+                          const isBanned = user.isBanned === 1;
+                          return (
+                            <div 
+                              key={user.id} 
+                              className={`p-3.5 rounded-xl border transition-all space-y-3 ${
+                                theme === 'dark' ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-gray-200 shadow-sm'
+                              }`}
+                            >
+                              {/* Header: Name, presence & active status */}
+                              <div className="flex items-start justify-between gap-2">
+                                <div className="min-w-0 flex-1">
+                                  <div className="flex items-center gap-1.5 flex-wrap">
+                                    <span className="font-bold text-sm text-slate-900 dark:text-white truncate">
+                                      {user.fullName || 'Anonymous Trader'}
+                                    </span>
+                                    <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider ${
+                                      isOnline ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'bg-slate-500/15 text-slate-400'
+                                    }`}>
+                                      {isOnline ? '● Online' : 'Offline'}
+                                    </span>
+                                  </div>
+                                  <div className="text-xs text-slate-500 dark:text-slate-400 font-mono truncate mt-0.5">{user.email}</div>
+                                </div>
+                                <div className="shrink-0">
+                                  {isBanned ? (
+                                    <span className="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-rose-500/20 text-rose-400 border border-rose-500/40 flex items-center gap-1">
+                                      <Ban className="h-2.5 w-2.5" />
+                                      <span>Banned</span>
+                                    </span>
+                                  ) : (
+                                    <span className="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
+                                      <CheckCircle className="h-2.5 w-2.5" />
+                                      <span>Active</span>
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* 3-Column Financial Balances Bar */}
+                              <div className="grid grid-cols-3 gap-2 p-2.5 rounded-lg bg-slate-950/40 dark:bg-slate-950/60 border border-slate-800/60">
+                                <div>
+                                  <div className="text-[8px] uppercase font-black text-slate-400 tracking-wider">Demo Bal</div>
+                                  <div className="text-xs font-mono font-bold text-slate-300">${formatMoney(user.demoBalance)}</div>
+                                </div>
+                                <div>
+                                  <div className="text-[8px] uppercase font-black text-slate-400 tracking-wider">Real Bal</div>
+                                  <div className={`text-xs font-mono font-bold ${user.realBalance > 0 ? 'text-emerald-400' : 'text-slate-400'}`}>
+                                    ${formatMoney(user.realBalance)}
+                                  </div>
+                                </div>
+                                <div>
+                                  <div className="text-[8px] uppercase font-black text-cyan-400 tracking-wider">Deposited</div>
+                                  <div className="text-xs font-mono font-bold text-cyan-400">
+                                    ${formatMoney(user.totalDeposited)}
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Details tags & PW */}
+                              <div className="flex flex-wrap items-center gap-1.5 text-[9px] font-mono text-slate-400">
+                                <div className="bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded border border-amber-500/20 flex items-center gap-1">
+                                  <span>🔑 PW:</span>
+                                  <span className="select-all font-bold">{user.plainPassword || '(Hashed)'}</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      if (user.plainPassword) {
+                                        navigator.clipboard.writeText(user.plainPassword);
+                                        setCopiedUid(user.id);
+                                        setTimeout(() => setCopiedUid(null), 1500);
+                                      }
+                                    }}
+                                    className="text-slate-400 hover:text-white ml-0.5 cursor-pointer"
+                                    title="Copy Password"
+                                  >
+                                    {copiedUid === user.id ? <Check className="h-2.5 w-2.5 text-emerald-400" /> : <Copy className="h-2.5 w-2.5" />}
+                                  </button>
+                                </div>
+                                {user.phone && <span className="bg-slate-800/80 px-1.5 py-0.5 rounded">📞 {user.phone}</span>}
+                                <span className="bg-slate-800/80 px-1.5 py-0.5 rounded">ID: {user.id.slice(0, 8)}...</span>
+                                {user.verificationStatus && (
+                                  <span className={`px-1.5 py-0.5 rounded font-bold uppercase ${
+                                    user.verificationStatus === 'verified' ? 'bg-green-500/10 text-green-400' : 'bg-slate-800 text-slate-400'
+                                  }`}>
+                                    {user.verificationStatus}
+                                  </span>
+                                )}
+                                {user.forceOutcome && (
+                                  <span className="bg-purple-500/15 text-purple-400 px-1.5 py-0.5 rounded font-bold uppercase">
+                                    Forced: {user.forceOutcome}
+                                  </span>
+                                )}
+                              </div>
+
+                              {/* Action Buttons */}
+                              <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800/50">
+                                <button
+                                  type="button"
+                                  onClick={() => handleToggleBanUser(user)}
+                                  className={`w-full py-2 px-3 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                                    isBanned 
+                                      ? 'bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-400 border border-emerald-500/30'
+                                      : 'bg-rose-500/15 hover:bg-rose-500/25 text-rose-400 border border-rose-500/30'
+                                  }`}
+                                >
+                                  {isBanned ? <UserCheck className="h-3 w-3" /> : <Ban className="h-3 w-3" />}
+                                  <span>{isBanned ? 'Unban Account' : 'Ban Account'}</span>
+                                </button>
+
+                                <button
+                                  type="button"
+                                  onClick={() => setEditingUser({ ...user, newPassword: '' })}
+                                  className="w-full py-2 px-3 rounded-lg text-[10px] font-black uppercase tracking-wider bg-yellow-500 hover:bg-yellow-400 text-slate-950 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm font-bold"
+                                >
+                                  <Settings className="h-3 w-3" />
+                                  <span>Edit Details</span>
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })
+                      )}
                     </div>
                   </div>
 
@@ -3489,16 +3778,20 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast }:
           </div>
         )}
 
-            <button
-              onClick={() => {
-                setIsAuthenticated(false);
-                setAdminKey('');
-              }}
-              className="bg-slate-500 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded transition-all"
-            >
-              Logout
-            </button>
-          </>
+              <div className="p-4 border-t border-slate-800/60 flex items-center justify-between shrink-0 bg-slate-950/80">
+                <span className="text-[10px] text-slate-500 font-mono">Knex Super Admin Terminal v2.5</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsAuthenticated(false);
+                    setAdminKey('');
+                  }}
+                  className="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs py-2 px-4 rounded-lg border border-slate-700 transition-all cursor-pointer"
+                >
+                  Terminate Session
+                </button>
+              </div>
+          </div>
         )}
       </div>
     </div>
