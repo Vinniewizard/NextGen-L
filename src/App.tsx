@@ -1789,7 +1789,7 @@ export default function App() {
   useEffect(() => {
     const handlePathCheck = () => {
       const path = window.location.pathname.toLowerCase();
-      if (path === '/secure-admin' || path === '/secure-admin/' || path.endsWith('/secure-admin') || path.endsWith('/secure-admin/')) {
+      if (path.includes('secure-admin')) {
         setIsAdminOpen(true);
       }
       

@@ -522,6 +522,42 @@ export default function FinanceDashboard({
       {/* ================= TAB 1: OVERVIEW ================= */}
       {activeTab === 'overview' && (
         <div className="space-y-6">
+          {/* Receive Crypto from External Wallet Link / Card */}
+          <div className="p-6 rounded-2xl bg-gradient-to-r from-indigo-950/60 via-[#181a20] to-[#181a20] border border-indigo-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xl">
+            <div className="flex items-start gap-4">
+              <div className="p-3 rounded-xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 shrink-0">
+                <RefreshCw className="w-6 h-6 animate-spin-slow" />
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    NOWPayments Integrated
+                  </span>
+                  <span className="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                    1% Fee Structure
+                  </span>
+                </div>
+                <h3 className="text-base font-black text-white">Receive Crypto from External Wallet</h3>
+                <p className="text-xs text-slate-400 max-w-xl leading-relaxed">
+                  Deposit USDT, BTC, ETH, or BNB instantly from Binance, MetaMask, TrustWallet, or any external wallet. Automatically routed with a transparent 1% service fee and 99% instant real balance credit.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 w-full md:w-auto">
+              <button
+                type="button"
+                onClick={() => {
+                  setDepositMethod('nowpayments');
+                  setActiveTab('deposit');
+                }}
+                className="flex-1 md:flex-none px-6 py-3 rounded-xl bg-[#fcd535] hover:bg-[#ebd525] text-[#0b0e11] font-black text-xs uppercase tracking-wider transition-all shadow-lg shadow-[#fcd535]/20 flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <span>Receive Crypto Now</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="p-5 rounded-2xl bg-[#181a20] border border-[#2b313a] space-y-3">
               <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">Live Real Balance</span>

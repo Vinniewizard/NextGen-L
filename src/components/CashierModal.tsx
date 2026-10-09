@@ -966,8 +966,8 @@ export default function CashierModal({
                     >
                       <RefreshCw className="w-5 h-5 text-yellow-400 shrink-0" />
                       <div>
-                        <span className="font-black text-xs block text-white">External Wallet (NOWPayments)</span>
-                        <span className="text-[9px] text-yellow-400 block font-bold">Receive Crypto (1% Fee)</span>
+                        <span className="font-black text-xs block text-white">NOWPayments Crypto</span>
+                        <span className="text-[9px] text-slate-400 block">BTC, ETH, USDT</span>
                       </div>
                     </button>
                   )}
