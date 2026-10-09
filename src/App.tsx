@@ -1789,11 +1789,15 @@ export default function App() {
   useEffect(() => {
     const handlePathCheck = () => {
       const path = window.location.pathname.toLowerCase();
-      if (path.includes('secure-admin')) {
+      const searchParams = new URLSearchParams(window.location.search);
+      if (path.includes('secure-admin') || searchParams.get('admin') === 'true') {
         setIsAdminOpen(true);
+        if (searchParams.get('admin') === 'true') {
+          const cleanUrl = window.location.pathname;
+          window.history.replaceState({}, document.title, cleanUrl);
+        }
       }
       
-      const searchParams = new URLSearchParams(window.location.search);
       const resetToken = searchParams.get('token');
       if (resetToken) {
         localStorage.setItem('pending_reset_token', resetToken);
