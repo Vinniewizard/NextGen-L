@@ -35,6 +35,7 @@ interface Stats {
   totalDepositsCount: number;
   totalWithdrawals: number;
   topDepositAmount: number;
+  totalFeesCollected?: number;
 }
 
 interface PendingDeposit {
@@ -1185,6 +1186,19 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast }:
                       </div>
                       <div className="p-2 rounded-lg bg-violet-500/10">
                         <TrendingUp className="h-5 w-5 text-violet-500" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className={`rounded-xl p-4 border transition-all ${theme === 'dark' ? 'bg-slate-900/60 border-slate-800 hover:border-slate-700' : 'bg-gray-50 border-gray-200 hover:border-gray-300'}`}>
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <p className="text-[10px] text-slate-500 font-extrabold uppercase tracking-wider">Business Fees (1%)</p>
+                        <p className="text-2xl font-black mt-1 text-cyan-400 font-mono">${(stats.totalFeesCollected || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                        <p className="text-[9px] text-slate-400 mt-1">Retained crypto deposit revenue</p>
+                      </div>
+                      <div className="p-2 rounded-lg bg-cyan-500/10">
+                        <Shield className="h-5 w-5 text-cyan-400" />
                       </div>
                     </div>
                   </div>

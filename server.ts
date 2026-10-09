@@ -168,6 +168,8 @@ function getSqliteInstance() {
     ensureSqliteColumn("users", "first_deposit_bonus_credited", "INTEGER DEFAULT 0");
     ensureSqliteColumn("users", "first_deposit_amount", "REAL DEFAULT 0.0");
     ensureSqliteColumn("users", "first_deposit_promo_credited", "INTEGER DEFAULT 0");
+    ensureSqliteColumn("credited_deposits", "fee_amount", "REAL DEFAULT 0.00");
+    ensureSqliteColumn("credited_deposits", "net_amount", "REAL DEFAULT 0.00");
     ensureSqliteColumn("withdrawals", "status", "TEXT DEFAULT 'pending'");
     ensureSqliteColumn("withdrawals", "payment_method", "TEXT DEFAULT 'Crypto'");
     ensureSqliteColumn("withdrawals", "binance_id", "TEXT");
@@ -1851,23 +1853,28 @@ Active technical indicator values: ${indicatorsString}.`}`;
           return res.status(404).json({ success: false, message: 'User not found in system database.' });
         }
 
-        // Add to credited_deposits table
-        await db.prepare(
-          `INSERT INTO credited_deposits (tx_hash, amount, coin, network, user_id, credited_at)
-           VALUES (?, ?, ?, ?, ?, ?)`
-        ).bind(txHash, actualAmount, status.pay_currency?.toUpperCase() || 'BTC', 'CRYPTO', user.id, now).run();
+        const feeAmount = Number((actualAmount * 0.01).toFixed(6));
+        const netAmount = Number((actualAmount - feeAmount).toFixed(6));
 
-        // Update user real_balance in SQL database
-        await db.prepare('UPDATE users SET real_balance = real_balance + ?, updated_at = ? WHERE id = ?').bind(actualAmount, now, user.id).run();
+        // Add to credited_deposits table with 1% business fee retention & net credit
+        await db.prepare(
+          `INSERT INTO credited_deposits (tx_hash, amount, coin, network, user_id, credited_at, fee_amount, net_amount)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+        ).bind(txHash, actualAmount, status.pay_currency?.toUpperCase() || 'BTC', 'CRYPTO', user.id, now, feeAmount, netAmount).run();
+
+        // Update user real_balance in SQL database with net amount (99%), channeling 1% to admin business account
+        await db.prepare('UPDATE users SET real_balance = real_balance + ?, updated_at = ? WHERE id = ?').bind(netAmount, now, user.id).run();
 
         // Apply first deposit match bonus if qualified
-        await applyFirstDepositBonusIfEligible(db, user.id, actualAmount, now);
+        await applyFirstDepositBonusIfEligible(db, user.id, netAmount, now);
 
         return res.json({ 
           success: true, 
-          message: 'Payment confirmed and credited.',
+          message: 'Payment confirmed from external wallet via NOWPayments gateway. 1% business fee retained for platform, 99% net credited to account.',
           status: status.payment_status,
-          creditedAmount: actualAmount
+          creditedAmount: netAmount,
+          feeAmount: feeAmount,
+          grossAmount: actualAmount
         });
       }
 
@@ -2143,23 +2150,25 @@ Active technical indicator values: ${indicatorsString}.`}`;
         const userId = parts[parts.length - 1];
 
         const amount = Number(actually_paid);
+        const feeAmount = Number((amount * 0.01).toFixed(6));
+        const netAmount = Number((amount - feeAmount).toFixed(6));
         const now = new Date().toISOString();
 
         const user = await db.prepare('SELECT id FROM users WHERE id = ? OR email = ?').bind(userId, userId).first();
         if (user) {
-          // Add to credited_deposits table
+          // Add to credited_deposits table with fee and net amount
           await db.prepare(
-            `INSERT INTO credited_deposits (tx_hash, amount, coin, network, user_id, credited_at)
-             VALUES (?, ?, ?, ?, ?, ?)`
-          ).bind(txHash, amount, pay_currency?.toUpperCase() || 'BTC', 'CRYPTO', user.id, now).run();
+            `INSERT INTO credited_deposits (tx_hash, amount, coin, network, user_id, credited_at, fee_amount, net_amount)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+          ).bind(txHash, amount, pay_currency?.toUpperCase() || 'BTC', 'CRYPTO', user.id, now, feeAmount, netAmount).run();
 
-          // Update user real_balance in SQL database
-          await db.prepare('UPDATE users SET real_balance = real_balance + ?, updated_at = ? WHERE id = ?').bind(amount, now, user.id).run();
+          // Update user real_balance in SQL database with net amount (99%), channeling 1% to admin account
+          await db.prepare('UPDATE users SET real_balance = real_balance + ?, updated_at = ? WHERE id = ?').bind(netAmount, now, user.id).run();
 
           // Apply first deposit match bonus if qualified
-          await applyFirstDepositBonusIfEligible(db, user.id, amount, now);
+          await applyFirstDepositBonusIfEligible(db, user.id, netAmount, now);
 
-          console.log(`[WEBHOOK] Successfully credited User ${user.id} with $${amount}`);
+          console.log(`[WEBHOOK] Successfully credited User ${user.id} with net $${netAmount} (Gross: $${amount}, 1% Fee: $${feeAmount} retained for business)`);
         } else {
           console.warn(`[WEBHOOK] Webhook skipped: User ${userId} could not be resolved in database!`);
         }
@@ -5859,6 +5868,9 @@ Active technical indicator values: ${indicatorsString}.`}`;
       const deposits = (await db.prepare('SELECT amount FROM credited_deposits').all())?.results || [];
       const withdrawals = (await db.prepare('SELECT amount FROM withdrawals').all())?.results || [];
 
+      const feeRes = await db.prepare('SELECT SUM(fee_amount) as total_fees FROM credited_deposits').first();
+      const totalFeesCollected = Number(feeRes?.total_fees || 0);
+
       const totalDeposits = deposits.reduce((sum: number, d: any) => sum + d.amount, 0);
       const totalUsers = users.length;
 
@@ -5869,7 +5881,8 @@ Active technical indicator values: ${indicatorsString}.`}`;
           totalDeposits,
           totalDepositsCount: deposits.length,
           totalWithdrawals: withdrawals.length,
-          topDepositAmount: deposits.length > 0 ? Math.max(...deposits.map((d: any) => d.amount)) : 0
+          topDepositAmount: deposits.length > 0 ? Math.max(...deposits.map((d: any) => d.amount)) : 0,
+          totalFeesCollected
         }
       });
     } catch (error: any) {
