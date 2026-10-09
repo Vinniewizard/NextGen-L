@@ -27,6 +27,7 @@ interface User {
   createdAt: string;
   lastLogin?: string;
   verificationStatus?: string;
+  totalDeposited?: number;
 }
 
 interface Stats {
@@ -1411,6 +1412,7 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast }:
                             <th className="p-3 text-left font-bold text-xs uppercase tracking-wider text-slate-400">User Identification</th>
                             <th className="p-3 text-right font-bold text-xs uppercase tracking-wider text-slate-400">Demo Account</th>
                             <th className="p-3 text-right font-bold text-xs uppercase tracking-wider text-slate-400">Real Account</th>
+                            <th className="p-3 text-right font-bold text-xs uppercase tracking-wider text-slate-400">Total Deposited</th>
                             <th className="p-3 text-left font-bold text-xs uppercase tracking-wider text-slate-400">Last Seen Activity</th>
                             <th className="p-3 text-left font-bold text-xs uppercase tracking-wider text-slate-400">Created At</th>
                             <th className="p-3 text-center font-bold text-xs uppercase tracking-wider text-slate-400">Actions</th>

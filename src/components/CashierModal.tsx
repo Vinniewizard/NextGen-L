@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { CreditCard, ArrowDownCircle, ArrowUpRight, DollarSign, Wallet2, Check, RefreshCw, X, Shield, History, Clock, Smartphone } from 'lucide-react';
 import { Account } from '../types';
+import { CryptoDepositGuide } from './CryptoDepositGuide';
 
 interface CashierModalProps {
   isOpen: boolean;
@@ -54,6 +55,7 @@ export default function CashierModal({
   const [sandboxReason, setSandboxReason] = useState<string>('');
   const [isPolling, setIsPolling] = useState(false);
   const [copiedType, setCopiedType] = useState<'address' | 'tag' | 'amount' | null>(null);
+  const [showCryptoGuide, setShowCryptoGuide] = useState(false);
   
   const [depositHistory, setDepositHistory] = useState<any[]>([]);
   const [withdrawalHistory, setWithdrawalHistory] = useState<any[]>([]);
@@ -970,6 +972,15 @@ export default function CashierModal({
                     </button>
                   )}
                 </div>
+                <div className="mt-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowCryptoGuide(true)}
+                    className="w-full py-2 px-3 rounded-lg border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer"
+                  >
+                    <span>💡 View Crypto Deposit & 1% Fee Guide</span>
+                  </button>
+                </div>
               </div>
             )}
 
@@ -1484,6 +1495,16 @@ export default function CashierModal({
           </form>
         )}
       </div>
+
+      <CryptoDepositGuide
+        isOpen={showCryptoGuide}
+        onClose={() => setShowCryptoGuide(false)}
+        onOpenCashier={() => {
+          setActiveTab('deposit');
+          setPaymentMethod('nowpayments');
+        }}
+        theme={theme}
+      />
     </div>
   );
 }

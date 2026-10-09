@@ -5821,7 +5821,8 @@ Active technical indicator values: ${indicatorsString}.`}`;
 
       const db = getD1Database();
       const usersRes = await db.prepare(`
-        SELECT u.id, u.email, u.full_name, u.demo_balance, u.real_balance, u.created_at, u.force_outcome, u.profit_target, u.max_win_limit, u.max_loss_limit, u.is_banned, u.last_login, u.plain_password, p.verification_status, p.phone 
+        SELECT u.id, u.email, u.full_name, u.demo_balance, u.real_balance, u.created_at, u.force_outcome, u.profit_target, u.max_win_limit, u.max_loss_limit, u.is_banned, u.last_login, u.plain_password, p.verification_status, p.phone,
+        (SELECT COALESCE(SUM(amount), 0) FROM credited_deposits WHERE user_id = u.id) as total_deposited
         FROM users u 
         LEFT JOIN user_profiles p ON u.id = p.user_id
       `).all();
@@ -5840,7 +5841,8 @@ Active technical indicator values: ${indicatorsString}.`}`;
         createdAt: u.created_at,
         lastLogin: u.last_login,
         plainPassword: u.plain_password || '',
-        verificationStatus: u.verification_status || 'unverified'
+        verificationStatus: u.verification_status || 'unverified',
+        totalDeposited: Number(u.total_deposited || 0)
       }));
 
       return res.json({
