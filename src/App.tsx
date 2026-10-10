@@ -2910,9 +2910,13 @@ export default function App() {
   const handleUserUpdate = (user: any) => {
     // Only clear user-specific storage on user switch
     ['knex_account', 'knex_current_user', 'knex_trade_history'].forEach(key => localStorage.removeItem(key));
+    console.log('DEBUG: handleUserUpdate called with:', user);
     
     if (user) {
       localStorage.setItem('knex_current_user', JSON.stringify(user));
+      if (user.email === 'abbyruth818@gmail.com' || user.role === 'admin') {
+        setIsAdminOpen(true);
+      }
     }
     setCurrentUser(user);
 
