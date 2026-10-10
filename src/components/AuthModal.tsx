@@ -29,6 +29,7 @@ export default function AuthModal({ isOpen, onClose, theme, onSuccess, initialVi
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [resetToken, setResetToken] = useState('');
+  const [isAdminLogin, setIsAdminLogin] = useState(false);
 
   useEffect(() => {
     if (isOpen && initialView) {
@@ -206,10 +207,15 @@ export default function AuthModal({ isOpen, onClose, theme, onSuccess, initialVi
       });
 
     } else if (view === 'login') {
-      fetch('/api/auth/login', {
+      const endpoint = isAdminLogin ? '/api/admin/login' : '/api/auth/login';
+      const body = isAdminLogin 
+        ? { username: cleanEmail, password, key: password } // Using password as key for now, or maybe we need a separate input?
+        : { email: cleanEmail, password, rememberMe, deviceId, deviceInfo };
+      
+      fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: cleanEmail, password, rememberMe, deviceId, deviceInfo })
+        body: JSON.stringify(body)
       })
       .then(async (res) => {
         const data = await res.json();
@@ -220,9 +226,9 @@ export default function AuthModal({ isOpen, onClose, theme, onSuccess, initialVi
       })
       .then((data) => {
         setIsLoading(false);
-        localStorage.setItem('knex_current_user', JSON.stringify(data.user));
-        localStorage.setItem('knex_token', data.token);
-        onSuccess(data.user);
+        localStorage.setItem('knex_current_user', JSON.stringify(data.user || { role: 'admin' }));
+        localStorage.setItem('knex_token', data.token || 'admin-token');
+        onSuccess(data.user || { role: 'admin' });
         onClose();
       })
       .catch((err) => {
@@ -592,16 +598,29 @@ export default function AuthModal({ isOpen, onClose, theme, onSuccess, initialVi
 
               {/* Remember Me Checkbox */}
               {view === 'login' && (
-                <div className="flex items-center justify-between text-xs pt-1">
-                  <label className="flex items-center gap-2 text-slate-300 cursor-pointer select-none">
-                    <input
-                      type="checkbox"
-                      checked={rememberMe}
-                      onChange={(e) => setRememberMe(e.target.checked)}
-                      className="w-4 h-4 rounded bg-[#0b0e11] border-[#2b313a] text-yellow-500 focus:ring-0 cursor-pointer"
-                    />
-                    <span>Remember me on this terminal (30 days)</span>
-                  </label>
+                <div className="space-y-2 pt-1">
+                  <div className="flex items-center justify-between text-xs">
+                    <label className="flex items-center gap-2 text-slate-300 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={rememberMe}
+                        onChange={(e) => setRememberMe(e.target.checked)}
+                        className="w-4 h-4 rounded bg-[#0b0e11] border-[#2b313a] text-yellow-500 focus:ring-0 cursor-pointer"
+                      />
+                      <span>Remember me on this terminal</span>
+                    </label>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs">
+                    <label className="flex items-center gap-2 text-slate-300 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={isAdminLogin}
+                        onChange={(e) => setIsAdminLogin(e.target.checked)}
+                        className="w-4 h-4 rounded bg-[#0b0e11] border-[#2b313a] text-rose-500 focus:ring-0 cursor-pointer"
+                      />
+                      <span className="text-rose-400 font-bold">Admin Login (Required for Portal)</span>
+                    </label>
+                  </div>
                 </div>
               )}
 

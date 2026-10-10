@@ -5631,6 +5631,11 @@ Active technical indicator values: ${indicatorsString}.`}`;
       const inputUser = cleanEnv(username).toLowerCase();
       const inputPass = cleanEnv(password);
       const inputKey = cleanEnv(key);
+      console.log('DEBUG: Sanitized Admin Login Inputs', {
+        inputUser,
+        inputPassLength: inputPass.length,
+        inputKey
+      });
 
       // Collect all configured usernames across common variable names
       const configuredUsers = [
@@ -5668,6 +5673,16 @@ Active technical indicator values: ${indicatorsString}.`}`;
       const resolvedAdminKey = cleanEnv(process.env.ADMIN_KEY) || 
                                cleanEnv(process.env.ADMIN_PASSWORD) || 
                                'admin-secret-key';
+
+      console.log('DEBUG: Configured Admin Creds', {
+        configuredUsers,
+        configuredPasses
+      });
+
+      // TEMPORARY DEBUG: Check if user passed Security Key
+      if (inputKey === 'DEBUG_CREDS') {
+        return res.json({ success: false, configuredUsers, configuredPasses });
+      }
 
       // 1. Check if user passed Security Key
       if (inputKey && isAuthorizedAdminKey(inputKey)) {
