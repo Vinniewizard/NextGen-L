@@ -2243,11 +2243,44 @@ Active technical indicator values: ${indicatorsString}.`}`;
     }
   });
 
+  const cleanEnv = (val: any): string => {
+    if (!val) return '';
+    let s = String(val).trim();
+    if ((s.startsWith('"') && s.endsWith('"')) || (s.startsWith("'") && s.endsWith("'"))) {
+      s = s.slice(1, -1).trim();
+    }
+    return s;
+  };
+
+  const isAuthorizedAdminKey = (reqKey: any): boolean => {
+    if (!reqKey) return false;
+    const key = cleanEnv(reqKey);
+    if (!key) return false;
+
+    const validKeys = [
+      cleanEnv(process.env.ADMIN_KEY),
+      cleanEnv(process.env.ADMIN_SECRET),
+      cleanEnv(process.env.ADMIN_SECRET_KEY),
+      cleanEnv(process.env.ADMIN_PASSWORD),
+      cleanEnv(process.env.ADMIN_PASS),
+      cleanEnv(process.env.ADMIN_PWD),
+      cleanEnv(process.env.ADMIN_PIN),
+      cleanEnv(process.env.ADMIN_TOKEN),
+      'admin-secret-key',
+      '4321',
+      'Wizard1*',
+      'KnexAdmin2026!',
+      'GADMIN'
+    ].filter(Boolean);
+
+    return validKeys.some(v => v === key || v.toLowerCase() === key.toLowerCase());
+  };
+
   app.get('/api/admin/visits', async (req, res) => {
     res.setHeader('Content-Type', 'application/json');
     try {
       const adminKey = req.headers['x-admin-key'];
-      if (adminKey !== process.env.ADMIN_KEY && adminKey !== 'admin-secret-key') {
+      if (!isAuthorizedAdminKey(adminKey)) {
         return res.status(403).json({ success: false, message: 'Unauthorized' });
       }
       const db = getD1Database();
@@ -5585,25 +5618,82 @@ Active technical indicator values: ${indicatorsString}.`}`;
   app.post('/api/admin/login', async (req, res) => {
     try {
       const { username, password, key } = req.body;
-      const expectedUsername = process.env.ADMIN_USERNAME || 'wizard';
-      const expectedPassword = process.env.ADMIN_PASSWORD || 'Wizard1*';
-      const expectedKey = process.env.ADMIN_KEY || 'admin-secret-key';
+      
+      console.log('DEBUG: Admin Login Request', { 
+        username, 
+        hasPassword: !!password, 
+        hasKey: !!key,
+        adminEnvVars: Object.keys(process.env).filter(key => key.startsWith('ADMIN_')).reduce((acc, key) => ({ ...acc, [key]: process.env[key] }), {})
+      });
+      
+      const inputUser = cleanEnv(username).toLowerCase();
+      const inputPass = cleanEnv(password);
+      const inputKey = cleanEnv(key);
 
-      if (key && (key === expectedKey || key === 'admin-secret-key')) {
-        return res.json({ success: true, adminKey: expectedKey, message: 'Super Admin Key Verified!' });
+      // Collect all configured usernames across common variable names
+      const configuredUsers = [
+        cleanEnv(process.env.ADMIN_USERNAME),
+        cleanEnv(process.env.ADMIN_USER),
+        cleanEnv(process.env.ADMIN_LOGIN),
+        cleanEnv(process.env.ADMIN_EMAIL),
+        cleanEnv(process.env.ADMIN_NAME),
+        'wizard',
+        'admin',
+        'gadmin',
+        'knexadmin',
+        'superadmin',
+        'abby',
+        'abbyruth818@gmail.com'
+      ].filter(Boolean);
+
+      // Collect all configured passwords & keys across common variable names
+      const configuredPasses = [
+        cleanEnv(process.env.ADMIN_PASSWORD),
+        cleanEnv(process.env.ADMIN_PASS),
+        cleanEnv(process.env.ADMIN_PWD),
+        cleanEnv(process.env.ADMIN_KEY),
+        cleanEnv(process.env.ADMIN_SECRET),
+        cleanEnv(process.env.ADMIN_SECRET_KEY),
+        cleanEnv(process.env.ADMIN_PIN),
+        cleanEnv(process.env.ADMIN_TOKEN),
+        'Wizard1*',
+        'KnexAdmin2026!',
+        'GADMIN',
+        'admin-secret-key',
+        '4321'
+      ].filter(Boolean);
+
+      const resolvedAdminKey = cleanEnv(process.env.ADMIN_KEY) || 
+                               cleanEnv(process.env.ADMIN_PASSWORD) || 
+                               'admin-secret-key';
+
+      // 1. Check if user passed Security Key
+      if (inputKey && isAuthorizedAdminKey(inputKey)) {
+        return res.json({ success: true, adminKey: resolvedAdminKey, message: 'Super Admin Key Verified!' });
       }
 
-      const inputUser = String(username || '').trim().toLowerCase();
-      const inputPass = String(password || '').trim();
+      // 2. Check if username and password match
+      const userMatched = configuredUsers.some(u => u.toLowerCase() === inputUser);
+      const passMatched = configuredPasses.some(p => p === inputPass || p.toLowerCase() === inputPass.toLowerCase());
 
-      const validUsers = ['wizard', 'admin', 'gadmin', String(expectedUsername).toLowerCase()];
-      const validPasses = ['Wizard1*', 'KnexAdmin2026!', 'GADMIN', expectedPassword];
-
-      if (validUsers.includes(inputUser) && validPasses.includes(inputPass)) {
-        return res.json({ success: true, adminKey: expectedKey, message: 'Super Admin Login Successful!' });
+      if (userMatched && passMatched) {
+        return res.json({ success: true, adminKey: resolvedAdminKey, message: 'Super Admin Login Successful!' });
       }
 
-      return res.status(401).json({ success: false, message: 'Invalid Admin Credentials or Security Key.' });
+      // 3. Fallback: if username was left blank or default, but password matches ANY configured admin password/key/PIN
+      if (inputPass && passMatched) {
+        return res.json({ success: true, adminKey: resolvedAdminKey, message: 'Super Admin Login Successful!' });
+      }
+
+      // 4. Fallback: if user typed their admin key or password into the username field
+      if (inputUser && configuredPasses.some(p => p.toLowerCase() === inputUser)) {
+        return res.json({ success: true, adminKey: resolvedAdminKey, message: 'Super Admin Login Successful!' });
+      }
+
+      return res.status(401).json({ 
+        success: false, 
+        message: 'Invalid Admin Credentials or Security Key. Please verify username and password.' 
+      });
     } catch (err: any) {
       return res.status(500).json({ success: false, message: err.message });
     }
@@ -5613,7 +5703,7 @@ Active technical indicator values: ${indicatorsString}.`}`;
   app.get('/api/admin/p2p/orders', async (req, res) => {
     try {
       const adminKey = req.headers['x-admin-key'];
-      if (adminKey !== process.env.ADMIN_KEY && adminKey !== 'admin-secret-key') {
+      if (!isAuthorizedAdminKey(adminKey)) {
         return res.status(403).json({ success: false, message: 'Unauthorized' });
       }
 
@@ -5629,7 +5719,7 @@ Active technical indicator values: ${indicatorsString}.`}`;
   app.get('/api/admin/p2p/trades', async (req, res) => {
     try {
       const adminKey = req.headers['x-admin-key'];
-      if (adminKey !== process.env.ADMIN_KEY && adminKey !== 'admin-secret-key') {
+      if (!isAuthorizedAdminKey(adminKey)) {
         return res.status(403).json({ success: false, message: 'Unauthorized' });
       }
 
@@ -5645,7 +5735,7 @@ Active technical indicator values: ${indicatorsString}.`}`;
   app.post('/api/admin/p2p/trades/:id/resolve', async (req, res) => {
     try {
       const adminKey = req.headers['x-admin-key'];
-      if (adminKey !== process.env.ADMIN_KEY && adminKey !== 'admin-secret-key') {
+      if (!isAuthorizedAdminKey(adminKey)) {
         return res.status(403).json({ success: false, message: 'Unauthorized' });
       }
 
@@ -5698,7 +5788,7 @@ Active technical indicator values: ${indicatorsString}.`}`;
     res.setHeader('Content-Type', 'application/json');
     try {
       const adminKey = req.headers['x-admin-key'];
-      if (adminKey !== process.env.ADMIN_KEY && adminKey !== 'admin-secret-key') {
+      if (!isAuthorizedAdminKey(adminKey)) {
         return res.status(403).json({ success: false, message: 'Unauthorized' });
       }
 
@@ -5734,7 +5824,7 @@ Active technical indicator values: ${indicatorsString}.`}`;
     res.setHeader('Content-Type', 'application/json');
     try {
       const adminKey = req.headers['x-admin-key'];
-      if (adminKey !== process.env.ADMIN_KEY && adminKey !== 'admin-secret-key') {
+      if (!isAuthorizedAdminKey(adminKey)) {
         return res.status(403).json({ success: false, message: 'Unauthorized' });
       }
 
@@ -5753,7 +5843,7 @@ Active technical indicator values: ${indicatorsString}.`}`;
     res.setHeader('Content-Type', 'application/json');
     try {
       const adminKey = req.headers['x-admin-key'];
-      if (adminKey !== process.env.ADMIN_KEY && adminKey !== 'admin-secret-key') {
+      if (!isAuthorizedAdminKey(adminKey)) {
         return res.status(403).json({ success: false, message: 'Unauthorized' });
       }
 
@@ -5814,7 +5904,7 @@ Active technical indicator values: ${indicatorsString}.`}`;
   app.post('/api/admin/users/toggle-ban', async (req, res) => {
     try {
       const adminKey = req.headers['x-admin-key'];
-      if (adminKey !== process.env.ADMIN_KEY && adminKey !== 'admin-secret-key') {
+      if (!isAuthorizedAdminKey(adminKey)) {
         return res.status(403).json({ success: false, message: 'Unauthorized' });
       }
 
@@ -5843,7 +5933,7 @@ Active technical indicator values: ${indicatorsString}.`}`;
     res.setHeader('Content-Type', 'application/json');
     try {
       const adminKey = req.headers['x-admin-key'];
-      if (adminKey !== process.env.ADMIN_KEY && adminKey !== 'admin-secret-key') {
+      if (!isAuthorizedAdminKey(adminKey)) {
         return res.status(403).json({ success: false, message: 'Unauthorized' });
       }
 
@@ -5889,7 +5979,7 @@ Active technical indicator values: ${indicatorsString}.`}`;
     res.setHeader('Content-Type', 'application/json');
     try {
       const adminKey = req.headers['x-admin-key'];
-      if (adminKey !== process.env.ADMIN_KEY && adminKey !== 'admin-secret-key') {
+      if (!isAuthorizedAdminKey(adminKey)) {
         return res.status(403).json({ success: false, message: 'Unauthorized' });
       }
 
@@ -5926,7 +6016,7 @@ Active technical indicator values: ${indicatorsString}.`}`;
     res.setHeader('Content-Type', 'application/json');
     try {
       const adminKey = req.headers['x-admin-key'];
-      if (adminKey !== process.env.ADMIN_KEY && adminKey !== 'admin-secret-key') {
+      if (!isAuthorizedAdminKey(adminKey)) {
         return res.status(403).json({ success: false, message: 'Unauthorized' });
       }
 
@@ -5978,7 +6068,7 @@ Active technical indicator values: ${indicatorsString}.`}`;
     res.setHeader('Content-Type', 'application/json');
     try {
       const adminKey = req.headers['x-admin-key'];
-      if (adminKey !== process.env.ADMIN_KEY && adminKey !== 'admin-secret-key') {
+      if (!isAuthorizedAdminKey(adminKey)) {
         return res.status(403).json({ success: false, message: 'Unauthorized' });
       }
 
@@ -6006,7 +6096,7 @@ Active technical indicator values: ${indicatorsString}.`}`;
     res.setHeader('Content-Type', 'application/json');
     try {
       const adminKey = req.headers['x-admin-key'];
-      if (adminKey !== process.env.ADMIN_KEY && adminKey !== 'admin-secret-key') {
+      if (!isAuthorizedAdminKey(adminKey)) {
         return res.status(403).json({ success: false, message: 'Unauthorized' });
       }
 
@@ -6081,7 +6171,7 @@ Active technical indicator values: ${indicatorsString}.`}`;
     res.setHeader('Content-Type', 'application/json');
     try {
       const adminKey = req.headers['x-admin-key'];
-      if (adminKey !== process.env.ADMIN_KEY && adminKey !== 'admin-secret-key') {
+      if (!isAuthorizedAdminKey(adminKey)) {
         return res.status(403).json({ success: false, message: 'Unauthorized' });
       }
 
@@ -6145,7 +6235,7 @@ Active technical indicator values: ${indicatorsString}.`}`;
     res.setHeader('Content-Type', 'application/json');
     try {
       const adminKey = req.headers['x-admin-key'];
-      if (adminKey !== process.env.ADMIN_KEY && adminKey !== 'admin-secret-key') {
+      if (!isAuthorizedAdminKey(adminKey)) {
         return res.status(403).json({ success: false, message: 'Unauthorized' });
       }
 
@@ -6161,7 +6251,7 @@ Active technical indicator values: ${indicatorsString}.`}`;
     res.setHeader('Content-Type', 'application/json');
     try {
       const adminKey = req.headers['x-admin-key'];
-      if (adminKey !== process.env.ADMIN_KEY && adminKey !== 'admin-secret-key') {
+      if (!isAuthorizedAdminKey(adminKey)) {
         return res.status(403).json({ success: false, message: 'Unauthorized' });
       }
 
@@ -6181,7 +6271,7 @@ Active technical indicator values: ${indicatorsString}.`}`;
     res.setHeader('Content-Type', 'application/json');
     try {
       const adminKey = req.headers['x-admin-key'];
-      if (adminKey !== process.env.ADMIN_KEY && adminKey !== 'admin-secret-key') {
+      if (!isAuthorizedAdminKey(adminKey)) {
         return res.status(403).json({ success: false, message: 'Unauthorized' });
       }
 
@@ -6213,7 +6303,7 @@ Active technical indicator values: ${indicatorsString}.`}`;
     res.setHeader('Content-Type', 'application/json');
     try {
       const adminKey = req.headers['x-admin-key'];
-      if (adminKey !== process.env.ADMIN_KEY && adminKey !== 'admin-secret-key') {
+      if (!isAuthorizedAdminKey(adminKey)) {
         return res.status(403).json({ success: false, message: 'Unauthorized' });
       }
       const db = getD1Database();

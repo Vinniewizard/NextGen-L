@@ -518,6 +518,19 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast, i
     }
   };
 
+  // Auto-restore admin session from localStorage if previously authenticated
+  useEffect(() => {
+    if (!isOpen) return;
+    try {
+      const savedKey = localStorage.getItem('knex_admin_session_token');
+      if (savedKey && !isAuthenticated) {
+        setAdminKey(savedKey);
+        setIsAuthenticated(true);
+        fetchData(savedKey);
+      }
+    } catch {}
+  }, [isOpen]);
+
   // Poll for real-time updates every 10 seconds while authenticated
   useEffect(() => {
     if (!isOpen || !isAuthenticated) return;
