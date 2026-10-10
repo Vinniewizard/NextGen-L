@@ -5623,7 +5623,9 @@ Active technical indicator values: ${indicatorsString}.`}`;
         username, 
         hasPassword: !!password, 
         hasKey: !!key,
-        adminEnvVars: Object.keys(process.env).filter(key => key.startsWith('ADMIN_')).reduce((acc, key) => ({ ...acc, [key]: process.env[key] }), {})
+        processEnvAdminKeys: Object.keys(process.env).filter(k => k.startsWith('ADMIN_')),
+        adminUsername: process.env.ADMIN_USERNAME,
+        adminPassword: process.env.ADMIN_PASSWORD
       });
       
       const inputUser = cleanEnv(username).toLowerCase();
