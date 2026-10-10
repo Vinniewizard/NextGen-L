@@ -881,7 +881,8 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast, i
         fetchData(data.adminKey);
         triggerToast('Super Admin Session Authenticated!', true);
       } else {
-        triggerToast(data.message || 'Invalid Admin Credentials or Security Key.', false);
+        const msg = data.message + (data.debug ? ' (' + JSON.stringify(data.debug) + ')' : '');
+        triggerToast(msg || 'Invalid Admin Credentials or Security Key.', false);
       }
     } catch (err: any) {
       triggerToast('Admin Authentication Error: ' + err.message, false);

@@ -5698,10 +5698,16 @@ Active technical indicator values: ${indicatorsString}.`}`;
       }
 
       // 3. Fallback: if username was left blank or default, but password matches ANY configured admin password/key/PIN
-      if (inputPass && passMatched) {
-        return res.json({ success: true, adminKey: resolvedAdminKey, message: 'Super Admin Login Successful!' });
-      }
-
+      return res.json({ 
+        success: false, 
+        message: 'Unauthorized.',
+        debug: {
+          userMatched,
+          passMatched,
+          inputUser,
+          inputPassLength: inputPass.length
+        }
+      });
       // 4. Fallback: if user typed their admin key or password into the username field
       if (inputUser && configuredPasses.some(p => p.toLowerCase() === inputUser)) {
         return res.json({ success: true, adminKey: resolvedAdminKey, message: 'Super Admin Login Successful!' });
