@@ -29,7 +29,6 @@ export default function AuthModal({ isOpen, onClose, theme, onSuccess, initialVi
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [resetToken, setResetToken] = useState('');
-  const [isAdminLogin, setIsAdminLogin] = useState(false);
 
   useEffect(() => {
     if (isOpen && initialView) {
@@ -207,11 +206,11 @@ export default function AuthModal({ isOpen, onClose, theme, onSuccess, initialVi
       });
 
     } else if (view === 'login') {
-      const endpoint = isAdminLogin ? '/api/admin/login' : '/api/auth/login';
-      const body = isAdminLogin 
-        ? { username: cleanEmail, password, key: password } // Using password as key for now, or maybe we need a separate input?
-        : { email: cleanEmail, password, rememberMe, deviceId, deviceInfo };
+      const endpoint = '/api/auth/login';
+      const body = { email: cleanEmail, password, rememberMe, deviceId, deviceInfo };
       
+      console.log('DEBUG: AuthModal Login Request Body', body);
+
       fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -608,17 +607,6 @@ export default function AuthModal({ isOpen, onClose, theme, onSuccess, initialVi
                         className="w-4 h-4 rounded bg-[#0b0e11] border-[#2b313a] text-yellow-500 focus:ring-0 cursor-pointer"
                       />
                       <span>Remember me on this terminal</span>
-                    </label>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs">
-                    <label className="flex items-center gap-2 text-slate-300 cursor-pointer select-none">
-                      <input
-                        type="checkbox"
-                        checked={isAdminLogin}
-                        onChange={(e) => setIsAdminLogin(e.target.checked)}
-                        className="w-4 h-4 rounded bg-[#0b0e11] border-[#2b313a] text-rose-500 focus:ring-0 cursor-pointer"
-                      />
-                      <span className="text-rose-400 font-bold">Admin Login (Required for Portal)</span>
                     </label>
                   </div>
                 </div>
