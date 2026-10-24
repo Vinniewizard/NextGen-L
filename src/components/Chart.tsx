@@ -223,7 +223,12 @@ export default function Chart({
     const observer = new ResizeObserver((entries) => {
       if (!entries || entries.length === 0) return;
       const { width, height } = entries[0].contentRect;
-      setDimensions({ width: Math.max(width, 300), height: Math.max(height, 300) });
+      const nextW = Math.max(Math.floor(width), 300);
+      const nextH = Math.max(Math.floor(height), 300);
+      setDimensions(prev => {
+        if (prev.width === nextW && prev.height === nextH) return prev;
+        return { width: nextW, height: nextH };
+      });
     });
     observer.observe(containerRef.current);
     return () => observer.disconnect();
@@ -384,7 +389,6 @@ export default function Chart({
   const candleInterval = 5000; // 5 seconds per candle default
   const getCandles = (useHeikinAshi = false) => {
     if (ticks.length === 0) return [];
-    console.log(`getCandles: interval=${candleInterval}, ticks=${ticks.length}`);
     const candles: { time: number; open: number; high: number; low: number; close: number }[] = [];
     let currentCandle: any = null;
 
@@ -411,7 +415,6 @@ export default function Chart({
     if (currentCandle) {
       candles.push(currentCandle);
     }
-    console.log(`getCandles: generated ${candles.length} candles`);
 
     if (useHeikinAshi && candles.length > 0) {
       const haCandles: any[] = [];

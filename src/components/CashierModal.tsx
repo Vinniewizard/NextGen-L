@@ -115,15 +115,16 @@ export default function CashierModal({
 
   // Synchronize limits without clearing the generated deposit Address
   useEffect(() => {
+    if (!isOpen) return;
     const minD = gameSettings?.minDeposit ?? 1;
     const minW = gameSettings?.minWithdrawal ?? 15;
     
     if (activeTab === 'deposit') {
-      if (amount < minD) setAmount(minD);
+      setAmount(prev => prev < minD ? minD : prev);
     } else {
-      if (amount < minW) setAmount(minW);
+      setAmount(prev => prev < minW ? minW : prev);
     }
-  }, [activeTab, gameSettings?.minDeposit, gameSettings?.minWithdrawal]);
+  }, [isOpen, activeTab, gameSettings?.minDeposit, gameSettings?.minWithdrawal]);
 
   const [activeDepositOrder, setActiveDepositOrder] = useState<any>(null);
 

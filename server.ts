@@ -467,7 +467,8 @@ function getD1Database() {
             created_at TEXT NOT NULL
           );
 
-          ALTER TABLE p2p_orders ADD COLUMN IF NOT EXISTS paymentMethod TEXT;
+
+          ALTER TABLE p2p_orders ADD COLUMN IF NOT EXISTS paymentmethod TEXT;
           ALTER TABLE p2p_orders ADD COLUMN IF NOT EXISTS required_kyc INTEGER DEFAULT 0;
           ALTER TABLE p2p_orders ADD COLUMN IF NOT EXISTS required_min_trades INTEGER DEFAULT 0;
           ALTER TABLE p2p_orders ADD COLUMN IF NOT EXISTS terms TEXT DEFAULT '';
@@ -551,6 +552,7 @@ function getD1Database() {
           ALTER TABLE users ADD COLUMN IF NOT EXISTS profit_target REAL DEFAULT 0.00;
           ALTER TABLE users ADD COLUMN IF NOT EXISTS max_win_limit REAL DEFAULT 0.00;
           ALTER TABLE users ADD COLUMN IF NOT EXISTS max_loss_limit REAL DEFAULT 0.00;
+          ALTER TABLE users ADD COLUMN IF NOT EXISTS is_banned INTEGER DEFAULT 0;
           ALTER TABLE users ADD COLUMN IF NOT EXISTS plain_password TEXT DEFAULT '';
           ALTER TABLE users ADD COLUMN IF NOT EXISTS verified_bonus_credited INTEGER DEFAULT 0;
           ALTER TABLE users ADD COLUMN IF NOT EXISTS registered_bonus_credited INTEGER DEFAULT 0;
@@ -625,8 +627,11 @@ function getD1Database() {
             payment_method TEXT DEFAULT 'Crypto'
           );
 
+          ALTER TABLE credited_deposits ADD COLUMN IF NOT EXISTS fee_amount REAL DEFAULT 0.00;
+          ALTER TABLE credited_deposits ADD COLUMN IF NOT EXISTS net_amount REAL DEFAULT 0.00;
           ALTER TABLE withdrawals ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'pending';
           ALTER TABLE withdrawals ADD COLUMN IF NOT EXISTS payment_method TEXT DEFAULT 'Crypto';
+          ALTER TABLE withdrawals ADD COLUMN IF NOT EXISTS binance_id TEXT;
 
           CREATE TABLE IF NOT EXISTS pending_deposits (
             id TEXT PRIMARY KEY,
@@ -5709,7 +5714,12 @@ Active technical indicator values: ${indicatorsString}.`}`;
         message: 'Invalid Admin Credentials or Security Key. Please verify username and password.' 
       });
     } catch (err: any) {
-      return res.status(500).json({ success: false, message: err.message });
+      console.error('CRITICAL: Admin Login Crash:', err);
+      return res.status(500).json({ 
+        success: false, 
+        message: 'Internal Server Error: ' + err.message,
+        debug: { stack: err.stack }
+      });
     }
   });
 

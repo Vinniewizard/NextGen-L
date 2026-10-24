@@ -666,8 +666,9 @@ export default function MarketingHub({
 
   // Re-draw whenever poster config or colors change
   useEffect(() => {
+    if (!isOpen) return;
     drawPoster();
-  }, [posterConfig, themeColors]);
+  }, [isOpen, posterConfig, themeColors]);
 
   // Export functions
   const handleDownloadPoster = () => {

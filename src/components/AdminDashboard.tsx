@@ -587,11 +587,11 @@ export default function AdminDashboard({ isOpen, onClose, theme, triggerToast, i
   }, [fbBotConfig.enabled]);
 
   useEffect(() => {
-    if (activeTab === 'telegram' && isAuthenticated) {
+    if (isOpen && activeTab === 'telegram' && isAuthenticated) {
       fetchTelegramAddons();
       fetchWhatsAppConfig();
     }
-  }, [activeTab, isAuthenticated]);
+  }, [isOpen, activeTab, isAuthenticated]);
 
   const fetchData = async (key: string) => {
     setLoading(true);

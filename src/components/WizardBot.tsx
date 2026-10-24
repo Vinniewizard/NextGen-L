@@ -133,21 +133,21 @@ export default function WizardBot({
 
   // Group polling & referrals
   useEffect(() => {
-    if (botTab === 'group') {
-      const fetchGroupMessages = async () => {
-        try {
-          const res = await fetch('/api/chat/messages');
-          const data = await res.json();
-          if (data.success) {
-            setGroupMessages(data.messages);
-          }
-        } catch(e) {}
-      };
-      fetchGroupMessages();
-      const interval = setInterval(fetchGroupMessages, 5000);
-      return () => clearInterval(interval);
-    }
-  }, [botTab]);
+    if (!isOpen || botTab !== 'group') return;
+    
+    const fetchGroupMessages = async () => {
+      try {
+        const res = await fetch('/api/chat/messages');
+        const data = await res.json();
+        if (data.success) {
+          setGroupMessages(data.messages);
+        }
+      } catch(e) {}
+    };
+    fetchGroupMessages();
+    const interval = setInterval(fetchGroupMessages, 5000);
+    return () => clearInterval(interval);
+  }, [botTab, isOpen]);
 
   useEffect(() => {
     if (botTab === 'group') {
@@ -156,15 +156,16 @@ export default function WizardBot({
   }, [groupMessages, botTab]);
 
   useEffect(() => {
-    if (currentUser) {
-      fetch('/api/users/referrals', {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('knex_token') || localStorage.getItem('knex_token') || ''}` }
-      })
-      .then(r => r.json())
-      .then(d => {
-        if (d.success) setReferralsCount(d.count);
-      });
-    }
+    if (!isOpen || !currentUser) return;
+
+    fetch('/api/users/referrals', {
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('knex_token') || ''}` }
+    })
+    .then(r => r.json())
+    .then(d => {
+      if (d.success) setReferralsCount(d.count);
+    })
+    .catch(() => {});
   }, [currentUser, isOpen]);
 
   const generateSimulatedScreenshot = (amount: string, coin: string) => {

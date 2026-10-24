@@ -1412,7 +1412,7 @@ export default function App() {
 
     // Calculate current target partition key
     const targetUserIdStr = currentUser ? currentUser.id : 'guest';
-    const targetMode = currentUser ? account.mode : 'demo'; // Force guest to demo mode
+    const targetMode = account.mode;
     const targetPartitionId = `${targetUserIdStr}_${targetMode}`;
 
     // Reset sync status when switching partition or on mount
@@ -1476,9 +1476,11 @@ export default function App() {
       }
     } else {
       // First time loading partition or user has no saved ticks, trigger initial generation
-      const initialMap = initializeAssetHistory(ASSETSList);
-      localStorage.setItem(`knex_ticks_history_v2_${targetPartitionId}`, JSON.stringify(initialMap));
-      setAssetsTicksMap(initialMap);
+      if (Object.keys(assetsTicksMapRef.current).length === 0) {
+        const initialMap = initializeAssetHistory(ASSETSList);
+        localStorage.setItem(`knex_ticks_history_v2_${targetPartitionId}`, JSON.stringify(initialMap));
+        setAssetsTicksMap(initialMap);
+      }
       gapTriggeredBackfill = true;
     }
 
@@ -1486,7 +1488,21 @@ export default function App() {
       if (savedTicks) {
         try {
           const parsed = JSON.parse(savedTicks);
-          setAssetsTicksMap(parsed);
+          setAssetsTicksMap(prev => {
+            const prevKeys = Object.keys(prev);
+            const nextKeys = Object.keys(parsed);
+            if (prevKeys.length === nextKeys.length && prevKeys.length > 0) {
+              const firstKey = prevKeys[0];
+              const prevLen = prev[firstKey]?.length || 0;
+              const nextLen = parsed[firstKey]?.length || 0;
+              if (prevLen === nextLen && prevLen > 0) {
+                const prevLastTime = prev[firstKey][prevLen - 1]?.time;
+                const nextLastTime = parsed[firstKey][nextLen - 1]?.time;
+                if (prevLastTime === nextLastTime) return prev;
+              }
+            }
+            return parsed;
+          });
         } catch (e) {}
       }
       if (JSON.stringify(activeContractsRef.current) !== JSON.stringify(nextContracts)) {
@@ -1504,20 +1520,20 @@ export default function App() {
       const nextId = `m-ac-${currentUser.id}`;
       const targetBalance = targetMode === 'real' ? userRealBal : userDemoBal;
       
-      const currAcc = accountRef.current;
-      if (currAcc.mode !== targetMode || currAcc.balance !== targetBalance || currAcc.id !== nextId) {
-        setAccount({
-          ...currAcc,
+      setAccount(prev => {
+        if (prev.mode === targetMode && prev.balance === targetBalance && prev.id === nextId) {
+          return prev;
+        }
+        return {
+          ...prev,
           mode: targetMode,
           balance: targetBalance,
           id: nextId
-        });
-      }
+        };
+      });
 
       const startRealUserBalance = Number(currentUser.real_balance) || 0;
-      if (realAccountBalance !== startRealUserBalance) {
-        setRealAccountBalance(startRealUserBalance);
-      }
+      setRealAccountBalance(prev => prev === startRealUserBalance ? prev : startRealUserBalance);
 
       // Fetch latest values and enable periodic balance sync
       syncUserBalance();
@@ -1531,17 +1547,23 @@ export default function App() {
       const currAcc = accountRef.current;
       const storedDemo = localStorage.getItem('knex_demo_balance');
       const fallbackBal = storedDemo !== null && !isNaN(Number(storedDemo)) ? Number(storedDemo) : (currAcc.balance || 10000.00);
-      if (currAcc.mode !== 'demo' || currAcc.id !== 'demo-temp-acc') {
-        setAccount({
-          ...currAcc,
-          mode: 'demo',
-          balance: fallbackBal,
+      
+      const adminDemoEnabled = JSON.parse(localStorage.getItem('knex_admin_demo_enabled') ?? 'true');
+      const adminRealEnabled = JSON.parse(localStorage.getItem('knex_admin_real_enabled') ?? 'true');
+      const preferredGuestMode: 'demo' | 'real' = (!adminDemoEnabled && adminRealEnabled) ? 'real' : currAcc.mode;
+
+      setAccount(prev => {
+        if (prev.mode === preferredGuestMode && prev.id === 'demo-temp-acc') {
+          return prev;
+        }
+        return {
+          ...prev,
+          mode: preferredGuestMode,
+          balance: preferredGuestMode === 'demo' ? fallbackBal : (realAccountBalance || 0),
           id: 'demo-temp-acc'
-        });
-      }
-      if (realAccountBalance !== 0.00) {
-        setRealAccountBalance(0.00);
-      }
+        };
+      });
+      setRealAccountBalance(prev => prev === 0.00 ? prev : 0.00);
     }
 
     // Update synchronization checkpoint ref
@@ -1669,7 +1691,7 @@ export default function App() {
   // Sync limit input on active asset swaps
   useEffect(() => {
     setSpotPriceLimit(activeAsset.price);
-  }, [activeAsset]);
+  }, [activeAsset.id]);
 
   const [gameSettings, setGameSettings] = useState<{
     globalTrendBias: number;
@@ -1716,7 +1738,7 @@ export default function App() {
     // Only write data if they belong together and match the current active partition ID
     // This blocks the race condition during login/logout/switch transitions
     const currentUserIdStr = currentUser ? currentUser.id : 'guest';
-    const currentMode = currentUser ? account.mode : 'demo';
+    const currentMode = account.mode;
     const currentPartitionId = `${currentUserIdStr}_${currentMode}`;
 
     if (currentPartitionId === prevPartitionIdRef.current) {
